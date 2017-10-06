@@ -1,0 +1,7 @@
+__pycache__/
+opencv/
+.idea/
+*.pyc
+PIGPIO/
+self_drive/training_data/
+self_drive/mlp_xml/*
