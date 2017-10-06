@@ -1,10 +1,10 @@
 import RPi.GPIO as GPIO
 import time
+import pigpio
 
 
 # part of the code in this file is Based on: https://github.com/simonmonk/raspirobotboard3/blob/master/python/rrb3.py
 class Car:
-
     MOTOR_DELAY = 0.2
 
     RIGHT_PWM_PIN = 14
@@ -20,6 +20,10 @@ class Car:
     # Ultrasonic sensor pins
     TRIGGER_PIN = 18
     ECHO_PIN = 23
+
+    # Servo motor pin and initialisation
+    SERVO_PIN = 15
+    servo = pigpio.pi()
 
     old_left_dir = -1
     old_right_dir = -1
@@ -56,7 +60,7 @@ class Car:
 
     def set_motors(self, left_pwm, left_dir, right_pwm, right_dir):
         if self.old_left_dir != left_dir or self.old_right_dir != right_dir:
-            self.set_driver_pins(0, 0, 0, 0)    # stop motors between sudden changes of direction
+            self.set_driver_pins(0, 0, 0, 0)  # stop motors between sudden changes of direction
             time.sleep(self.MOTOR_DELAY)
         self.set_driver_pins(left_pwm, left_dir, right_pwm, right_dir)
         self.old_left_dir = left_dir
@@ -118,6 +122,18 @@ class Car:
         distance_cm = pulse_len / 0.000058
         return distance_cm
 
+    # functions to change angle of servo motor
+    def send_pluse(self, angle):
+        self.servo.set_servo_pulsewidth(self.SERVO_PIN, angle)
+
+    def look_center(self):
+        self.servo.set_servo_pulsewidth(self.SERVO_PIN, 1800)
+
+    def look_left(self):
+        self.servo.set_servo_pulsewidth(self.SERVO_PIN, 2500)
+
+    def look_right(self):
+        self.servo.set_servo_pulsewidth(self.SERVO_PIN, 700)
+
     def cleanup(self):
         GPIO.cleanup()
-
