@@ -19,12 +19,15 @@ camera = PiCamera()
 camera.resolution = (320, 240)
 camera.framerate = 64
 rawCapture = PiRGBArray(camera, size=(320, 240))
+
 # capture frames from the camera
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     # grab the raw NumPy array representing the image, then initialize the timestamp
     # and occupied/unoccupied text
     image = frame.array
     image.setflags(write=1)
+
+    obj_distance = car.get_distance()
  
     # print ("Resizing")
     image = cv2.resize(image, None, fx=scf, fy=scf, interpolation=cv2.INTER_AREA)
@@ -35,7 +38,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     #print "Sign Detected"
     print (left_sign_rect)
     if len(left_sign_rect) == 0:
-        car.set_motors(0.4, 1, 0.5, 1)
+        if obj_distance is not None and obj_distance < 30:
+            car.set_motors(0, 0, 0, 0)
+        else:
+            car.set_motors(0.4, 1, 0.5, 1)
     else:
         car.left(1.2)
     
