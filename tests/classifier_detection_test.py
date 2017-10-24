@@ -6,7 +6,7 @@ from picamera import PiCamera
 from car import Car
 
 print "Load classifier"
-sign_cascade = cv2.CascadeClassifier('./cascade.xml')
+sign_cascade = cv2.CascadeClassifier('./left_sign_classifier.xml')
  
 cap = None
 scf = 0.5

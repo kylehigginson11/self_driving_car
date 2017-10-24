@@ -17,7 +17,7 @@ car = Car(9, 6)
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
 camera.resolution = (320, 240)
-camera.framerate = 32
+camera.framerate = 64
 rawCapture = PiRGBArray(camera, size=(320, 240))
 # capture frames from the camera
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
@@ -34,11 +34,12 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
  
     #print "Sign Detected"
     print (left_sign_rect)
-    if len(left_sign_rect) != 0:
-        car.left()
+    if len(left_sign_rect) == 0:
+        car.set_motors(0.4, 1, 0.5, 1)
     else:
-        car.set_motors(0.6, 1, 0.6, 1)
- 
+        car.left(1.2)
+    
+    rawCapture.truncate(0) 
     c = cv2.waitKey(1)
     if c == 27:
         break
