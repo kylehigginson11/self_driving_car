@@ -38,10 +38,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     #print "Sign Detected"
     print (left_sign_rect)
     if len(left_sign_rect) == 0:
-        if obj_distance is not None and obj_distance < 30:
+        if obj_distance is not None and obj_distance < 15:
+            print ("Object in front")
             car.set_motors(0, 0, 0, 0)
         else:
-            car.set_motors(0.4, 1, 0.5, 1)
+            car.set_motors(0.5, 1, 0.5, 1)
     else:
         car.left(1.2)
     
