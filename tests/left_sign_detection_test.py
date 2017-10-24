@@ -5,8 +5,8 @@ import sys
 from picamera import PiCamera
 from car import Car
 
-print "Load classifier"
-left_sign_cascade = cv2.CascadeClassifier('./cascade.xml')
+print ("Load classifier")
+left_sign_cascade = cv2.CascadeClassifier('./left_sign_classifier.xml')
  
 cap = None
 scf = 0.5
@@ -16,24 +16,24 @@ camera = PiCamera()
 car = Car(9, 6)
  
 while True:
-    print "Capture image"
+    print ("Capture image")
     camera.capture(image)
     
-    print "Get a frame"
+    print ("Get a frame")
     frame = cv2.imread(image)
  
-    print "Resizing"
+    print ("Resizing")
     frame = cv2.resize(frame, None, fx=scf, fy=scf, interpolation=cv2.INTER_AREA)
  
-    print "Face detection"
+    print ("Face detection")
     left_sign_rect = left_sign_cascade.detectMultiScale(frame, 1.3, 5)
  
     #print "Sign Detected"
-    print sign_rect
-    if len(sign_rect) == 0:
-        car.turn_left()
+    print (left_sign_rect)
+    if len(left_sign_rect) != 0:
+        car.left()
     else:
-        car.stop()
+        car.set_motors(0.6, 1, 0.6, 1)
  
     #print "Drawing rectangle"
     
