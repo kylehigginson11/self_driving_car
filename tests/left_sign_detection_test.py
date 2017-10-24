@@ -3,6 +3,7 @@ import numpy as np
 from time import sleep
 import sys
 from picamera import PiCamera
+from picamera.array import PiRGBArray
 from car import Car
 
 print ("Load classifier")
@@ -10,23 +11,26 @@ left_sign_cascade = cv2.CascadeClassifier('./left_sign_classifier.xml')
  
 cap = None
 scf = 0.5
-image = "image.jpg"
- 
-camera = PiCamera()
+
 car = Car(9, 6)
+
+# initialize the camera and grab a reference to the raw camera capture
+camera = PiCamera()
+camera.resolution = (320, 240)
+camera.framerate = 32
+rawCapture = PiRGBArray(camera, size=(320, 240))
+# capture frames from the camera
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    # grab the raw NumPy array representing the image, then initialize the timestamp
+    # and occupied/unoccupied text
+    image = frame.array
+    image.setflags(write=1)
  
-while True:
-    print ("Capture image")
-    camera.capture(image)
-    
-    print ("Get a frame")
-    frame = cv2.imread(image)
+    # print ("Resizing")
+    image = cv2.resize(image, None, fx=scf, fy=scf, interpolation=cv2.INTER_AREA)
  
-    print ("Resizing")
-    frame = cv2.resize(frame, None, fx=scf, fy=scf, interpolation=cv2.INTER_AREA)
- 
-    print ("Face detection")
-    left_sign_rect = left_sign_cascade.detectMultiScale(frame, 1.3, 5)
+    # print ("Face detection")
+    left_sign_rect = left_sign_cascade.detectMultiScale(image, 1.3, 5)
  
     #print "Sign Detected"
     print (left_sign_rect)
@@ -34,14 +38,6 @@ while True:
         car.left()
     else:
         car.set_motors(0.6, 1, 0.6, 1)
- 
-    #print "Drawing rectangle"
-    
-    #for (x,y,w,h) in sign_rect:
-    #    cv2.rectangle(frame, (x,y), (x+w,y+h), (0,0,255), 3)
- 
-    #print "Show image"
-    #cv2.imshow('Face Detector', frame)
  
     c = cv2.waitKey(1)
     if c == 27:
