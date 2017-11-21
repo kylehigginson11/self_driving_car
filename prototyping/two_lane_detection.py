@@ -9,13 +9,13 @@ from car import Car
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
 camera.resolution = (320, 240)
-camera.framerate = 32
+camera.framerate = 8
 rawCapture = PiRGBArray(camera, size=(320, 240))
 
 
 # initialise car
 car = Car(9, 6)
-car.forward()
+#car.reverse()
 
 def nothing(x):
     pass
@@ -31,18 +31,19 @@ time.sleep(0.1)
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     image = frame.array
     image.setflags(write=1)
+    distance = car.get_distance()
 
     # apply a blur to the frame for faster processing
     image = cv2.GaussianBlur(image, (5, 5), 0)
 
     # strip the image down
-    #image = image[140:240, :]
+    image = image[140:240, :]
 
     # convert to an HSV stream
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     LOW = np.array([0, 0, 0])
-    HIGH = np.array([20, 255, 255])
+    HIGH = np.array([15, 255, 255])
 
     # create mask
     mask = cv2.inRange(hsv, LOW, HIGH)
@@ -50,31 +51,36 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     thresholdimage, contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     biggest_area = 0
     # print (contours)
-    if contours:
+    if len(contours):
+        #print (len(contours))
         for contour in contours:
-            this_area = cv2.contourArea(contour)
-            if this_area > biggest_area:
-                (x, y, w, h) = cv2.boundingRect(contour)
-                if x < 100:
-                    # assume this is left lane
-                    biggest_area = this_area
-                    #print ("left lane: " + str(y))
-                    if x > 0:
-                        # turn right
-                        car.set_motors(0.2, 1, 0.7. 1)
-                    else if x == 0:
-                        # go forward
-                        car.set_motors(0.7, 1, 0.7, 1)
+            (x, y, w, h) = cv2.boundingRect(contour)
+            if x < 150:
+                # assume this is left lane
+                print ("left lane: " + str(x))
+                if x > 80 and x < 120:
+                    print("turn right")
+                    car.set_motors(0.5, 0, 0.2, 0)
+                #elif x > 120:
+                #    car.set_motors(0.5, 0, 0.1, 0)
                 else:
-                    # assume right lane
-                    #print ("right lane: " + str(y))
-                    if x < 150:
-                        # turn left
-                        car.set_motors(0.7, 1, 0.2, 1)
-                    else if x > 150:
-                        # go forward
-                        car.set_motors(0.7, 1, 0.7, 1)
-
+                    # go forward
+                    car.set_motors(0.4, 0, 0.4, 0)
+            else:
+                # assume right lane
+                print ("right lane: " + str(x))
+                if x > 160 and x < 200:
+                    # turn left
+                    print ("Turn left")
+                    car.set_motors(0.2, 0, 0.5, 0)
+                #elif x > 180 and x < 200:
+                #    car.set_motors(0.1, 0, 0.5, 0)
+                else:
+                    # go forward
+                    car.set_motors(0.4, 0, 0.4, 0)
+    if distance < 20:
+        print ("Object in Front!")
+        car.stop()
     #res = cv2.bitwise_and(image, image, mask=mask)
 
    # update image on window
@@ -87,5 +93,5 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
-    car.stop()
+        car.stop()
         break
