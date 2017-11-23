@@ -42,7 +42,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             print ("Object in front")
             car.set_motors(0, 0, 0, 0)
         else:
-            car.set_motors(0.5, 1, 0.5, 1)
+            car.set_motors(0.5, 0, 0.5, 0)
     else:
         car.left(1.2)
     

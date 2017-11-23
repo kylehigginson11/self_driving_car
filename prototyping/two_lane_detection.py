@@ -51,7 +51,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     thresholdimage, contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     biggest_area = 0
     # print (contours)
-    if len(contours):
+    if len(contours) > 3:
         #print (len(contours))
         for contour in contours:
             (x, y, w, h) = cv2.boundingRect(contour)
@@ -60,24 +60,24 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 print ("left lane: " + str(x))
                 if x > 80 and x < 120:
                     print("turn right")
-                    car.set_motors(0.5, 0, 0.2, 0)
+                    car.set_motors(0.5, 0, 0.1, 0)
                 #elif x > 120:
                 #    car.set_motors(0.5, 0, 0.1, 0)
-                else:
+                elif x < 40:
                     # go forward
-                    car.set_motors(0.4, 0, 0.4, 0)
+                    car.set_motors(0.5, 0, 0.5, 0)
             else:
                 # assume right lane
                 print ("right lane: " + str(x))
                 if x > 160 and x < 200:
                     # turn left
                     print ("Turn left")
-                    car.set_motors(0.2, 0, 0.5, 0)
+                    car.set_motors(0.1, 0, 0.5, 0)
                 #elif x > 180 and x < 200:
                 #    car.set_motors(0.1, 0, 0.5, 0)
-                else:
+                elif x > 220 and x > 300:
                     # go forward
-                    car.set_motors(0.4, 0, 0.4, 0)
+                    car.set_motors(0.5, 0, 0.5, 0)
     if distance < 20:
         print ("Object in Front!")
         car.stop()
