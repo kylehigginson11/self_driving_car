@@ -9,7 +9,7 @@ from car import Car
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
 camera.resolution = (320, 240)
-camera.framerate = 2
+camera.framerate = 16
 rawCapture = PiRGBArray(camera, size=(320, 240))
 
 
@@ -51,11 +51,12 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     thresholdimage, contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     biggest_area = 0
     # print (contours)
-    if len(contours) > 3:
-        #print (len(contours))
+    if len(contours) > 1:
+        print (len(contours))
         for contour in contours:
             (x, y, w, h) = cv2.boundingRect(contour)
-            if x < 150:
+            print (x, y, w, h)
+            if x < 150 and w > 5 and h > 5:
                 # assume this is left lane
                 print ("left lane: " + str(x))
                 if x > 80 and x < 120:
@@ -69,13 +70,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             else:
                 # assume right lane
                 print ("right lane: " + str(x))
-                if x > 160 and x < 200:
+                if x > 190 and x < 210:
                     # turn left
                     print ("Turn left")
                     car.set_motors(0.25, 0, 0.4, 0)
                 #elif x > 180 and x < 200:
                 #    car.set_motors(0.1, 0, 0.5, 0)
-                elif x > 220 and x > 300:
+                elif x > 220 and x < 300:
                     # go forward
                     car.set_motors(0.4, 0, 0.4, 0)
         time.sleep(0.2)

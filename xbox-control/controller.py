@@ -44,23 +44,18 @@ while not joy.Back():
     if joy.dpadUp():
         car.forward()
         print "U",
-    else:
-        print " ",
-    if joy.dpadDown():
+    elif joy.dpadDown():
         car.reverse()
         print "D",
-    else:
-        print " ",
-    if joy.dpadLeft():
+    elif joy.dpadLeft():
         car.left()
         print "L",
-    else:
-        print " ",
-    if joy.dpadRight():
+    elif joy.dpadRight():
         print "R",
         car.right()
     else:
         print " ",
+        car.stop()
         
     # Move cursor back to start of line
     print chr(13),

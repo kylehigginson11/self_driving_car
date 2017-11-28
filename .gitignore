@@ -9,3 +9,4 @@ negative_images/*
 negative_images*
 positive_images/*
 positive_images*
+*.swp
