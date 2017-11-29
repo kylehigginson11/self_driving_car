@@ -6,7 +6,7 @@ def fmtFloat(n):
     return '{:6.3f}'.format(n)
     
 joy = xbox.Joystick()
-car = Car(9, 6)
+#car = Car(9, 6)
 
 print "Xbox controller sample: Press Back button to exit"
 # Loop until back button is pressed
@@ -36,26 +36,26 @@ while not joy.Back():
         print " ",
     if joy.Y():
         print "Y",
-        car.stop()
+        #car.stop()
     else:
         print " ",
     # Dpad U/D/L/R
     print "Dpad ",
     if joy.dpadUp():
-        car.forward()
+        #car.forward()
         print "U",
     elif joy.dpadDown():
-        car.reverse()
+        #car.reverse()
         print "D",
     elif joy.dpadLeft():
-        car.left()
+        #car.left()
         print "L",
     elif joy.dpadRight():
         print "R",
-        car.right()
+        #car.right()
     else:
         print " ",
-        car.stop()
+        #car.stop()
         
     # Move cursor back to start of line
     print chr(13),
