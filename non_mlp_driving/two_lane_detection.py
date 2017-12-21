@@ -4,7 +4,7 @@ from picamera import PiCamera
 import time
 import cv2
 import numpy as np
-from car import Car
+from car_control.car import Car
 
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
