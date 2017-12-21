@@ -10,3 +10,4 @@ negative_images*
 positive_images/*
 positive_images*
 *.swp
+neural_network_training/training_data/*

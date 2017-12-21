@@ -39,8 +39,7 @@ class Joystick:
         joy = xbox.Joystick()
     """
     def __init__(self,refreshRate = 30):
-        # sudo xboxdrv --device-by-id "045e:02a9" --type xbox360-wireless --detach-kernel-driver
-        self.proc = subprocess.Popen(['xboxdrv','--device-by-id', '045e:02a9','--type', 'xbox360-wireless','--detach-kernel-driver'], stdout=subprocess.PIPE)
+        self.proc = subprocess.Popen(['xboxdrv','--type', 'xbox360-wireless','--detach-kernel-driver'], stdout=subprocess.PIPE)
         self.pipe = self.proc.stdout
         #
         self.connectStatus = False  #will be set to True once controller is detected and stays on
