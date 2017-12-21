@@ -11,3 +11,4 @@ positive_images/*
 positive_images*
 *.swp
 neural_network_training/training_data/*
+neural_network_training/mlp_xml/*
