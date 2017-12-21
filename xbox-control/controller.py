@@ -1,12 +1,12 @@
 import xbox
-from car import Car
+from car_control.car import Car
 
 # Format floating point number to string format -x.xxx
 def fmtFloat(n):
     return '{:6.3f}'.format(n)
     
 joy = xbox.Joystick()
-#car = Car(9, 6)
+car = Car(9, 6)
 
 print "Xbox controller sample: Press Back button to exit"
 # Loop until back button is pressed
