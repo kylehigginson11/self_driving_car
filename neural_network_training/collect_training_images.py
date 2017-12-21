@@ -5,8 +5,8 @@ import os
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 import time
-from car import Car
-import xbox
+from car_control.car import Car
+from xbox_control import xbox
 
 
 class CollectTrainingImages:
