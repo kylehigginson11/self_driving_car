@@ -90,19 +90,19 @@ class CollectTrainingImages:
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[1]))
                     saved_frame += 1
-                    self.car.set_motors(0.2, 0, 0.4, 0)
+                    self.car.set_motors(0.1, 0, 0.2, 0)
                 elif self.joy.Y():
                     print("Forward")
                     saved_frame += 1
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[2]))
-                    self.car.set_motors(0.4, 0, 0.4, 0)
+                    self.car.set_motors(0.2, 0, 0.2, 0)
                 elif self.joy.B():
                     print("Forward Right")
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[3]))
                     saved_frame += 1
-                    self.car.set_motors(0.4, 0, 0.2, 0)
+                    self.car.set_motors(0.2, 0, 0.1, 0)
                 elif self.joy.dpadDown():
                     print ('exit')
                     self.car.stop()
