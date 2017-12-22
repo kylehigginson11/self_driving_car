@@ -68,7 +68,7 @@ class StreamFrames:
         print ("Camera Initialised ...")
 
         try:
-            for frame in camera.capture_continuous(raw_capture, 'bgr', use_video_port=True):
+            for frame in camera.capture_continuous(raw_capture, 'bgr'):
                 image = frame.array
                 image.setflags(write=1)
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

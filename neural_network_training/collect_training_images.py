@@ -66,12 +66,12 @@ class CollectTrainingImages:
         # stream video frames one by one
         try:
             frame_number = 1
-            for frame in self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True):
+            for frame in self.camera.capture_continuous(self.rawCapture, format="bgr"):
 
                 gray_image = cv2.cvtColor(frame.array, cv2.COLOR_BGR2GRAY)
 
                 # select lower half of the image
-                lower_half = gray_image[120:240, :]
+                lower_half = gray_image[100:220, :]
 
                 # save streamed images
                 cv2.imwrite('training_images/frame{:>05}.jpg'.format(frame_number), lower_half)
