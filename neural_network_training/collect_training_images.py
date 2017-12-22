@@ -34,10 +34,10 @@ class CollectTrainingImages:
 
     def setup_camera(self):
         # initialize the camera and grab a reference to the raw camera capture
-        self.camera.resolution = (320, 240)
-        self.camera.framerate = 32
+        self.camera.resolution = (640, 480)
+        self.camera.framerate = 60
         self.camera.rotation = 180
-        self.rawCapture = PiRGBArray(self.camera, size=(320, 240))
+        self.rawCapture = PiRGBArray(self.camera, size=(640, 480))
 
     def save_training_data(self, train_images, train_labels):
         # save training data as a numpy file and name it by current time
@@ -60,7 +60,7 @@ class CollectTrainingImages:
 
         # get current amount of ticks
         time_start = cv2.getTickCount()
-        image_array = np.zeros((1, 38400))
+        image_array = np.zeros((1, 76800))
         label_array = np.zeros((1, 4), 'float')
 
         # stream video frames one by one
@@ -71,13 +71,13 @@ class CollectTrainingImages:
                 gray_image = cv2.cvtColor(frame.array, cv2.COLOR_BGR2GRAY)
 
                 # select lower half of the image
-                lower_half = gray_image[100:220, :]
+                lower_half = gray_image[360:480, :]
 
                 # save streamed images
                 cv2.imwrite('training_images/frame{:>05}.jpg'.format(frame_number), lower_half)
 
                 # reshape the roi image into one numpy array
-                temp_array = lower_half.reshape(1, 38400).astype(np.float32)
+                temp_array = lower_half.reshape(1, 76800).astype(np.float32)
 
                 # increment frame number and total frames
                 frame_number += 1
@@ -90,19 +90,19 @@ class CollectTrainingImages:
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[1]))
                     saved_frame += 1
-                    self.car.set_motors(0.1, 0, 0.2, 0)
+                    self.car.set_motors(0.15, 0, 0.3, 0)
                 elif self.joy.Y():
                     print("Forward")
                     saved_frame += 1
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[2]))
-                    self.car.set_motors(0.2, 0, 0.2, 0)
+                    self.car.set_motors(0.3, 0, 0.3, 0)
                 elif self.joy.B():
                     print("Forward Right")
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[3]))
                     saved_frame += 1
-                    self.car.set_motors(0.2, 0, 0.1, 0)
+                    self.car.set_motors(0.3, 0, 0.15, 0)
                 elif self.joy.dpadDown():
                     print ('exit')
                     self.car.stop()
