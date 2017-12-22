@@ -74,7 +74,7 @@ class StreamFrames:
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
                 # lower half of the image
-                half_gray = gray[120:240, :]
+                half_gray = gray[100:220, :]
 
                 # reshape image
                 image_array = half_gray.reshape(1, 38400).astype(np.float32)
