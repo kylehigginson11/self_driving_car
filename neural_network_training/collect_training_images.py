@@ -66,7 +66,7 @@ class CollectTrainingImages:
         # stream video frames one by one
         try:
             frame_number = 1
-            for frame in self.camera.capture_continuous(self.rawCapture, format="bgr"):
+            for frame in self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True):
 
                 gray_image = cv2.cvtColor(frame.array, cv2.COLOR_BGR2GRAY)
 

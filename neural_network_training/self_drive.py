@@ -17,7 +17,9 @@ class NeuralNetwork:
 
     def create(self):
         # load neural network from file
+        print ("Loading MLP ...")
         self.ann = cv2.ml.ANN_MLP_load('mlp_xml/mlp.xml')
+        print ("MLP loaded ...")
 
     def predict(self, samples):
         # make prediction on passed data
@@ -68,7 +70,7 @@ class StreamFrames:
         print ("Camera Initialised ...")
 
         try:
-            for frame in camera.capture_continuous(raw_capture, 'bgr'):
+            for frame in camera.capture_continuous(raw_capture, 'bgr', use_video_port=True):
                 image = frame.array
                 image.setflags(write=1)
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
