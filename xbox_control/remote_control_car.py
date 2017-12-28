@@ -1,6 +1,7 @@
 import xbox
+import sys
+sys.path.append('../')
 from car_control.car import Car
-
 
 # Format floating point number to string format -x.xxx
 def convert_float(n):
@@ -26,11 +27,11 @@ while not joy.Back():
     if joy.A():
         car.reverse()
     elif joy.B():
-        car.right()
+        car.set_motors(0.4, 0, 0.33, 0)
     elif joy.X():
-        car.left()
+        car.set_motors(0.3, 0, 0.4, 0)
     elif joy.Y():
-        car.forward()
+        car.set_motors(0.4, 0, 0.4, 0)
     # DPAD, up, down, left or right
     elif joy.dpadUp():
         car.forward()
