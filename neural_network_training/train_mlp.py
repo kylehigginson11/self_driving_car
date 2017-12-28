@@ -12,7 +12,7 @@ class TrainMLP:
         self.start_time = cv2.getTickCount()
         print ('Loading training data...')
         # load training data
-        self.image_array = np.zeros((1, 76800))
+        self.image_array = np.zeros((1, 38400))
         self.label_array = np.zeros((1, 4), 'float')
         self.training_data = glob.glob('training_data/*.npz')
         self.load_training_data()
@@ -48,7 +48,7 @@ class TrainMLP:
         start_time = cv2.getTickCount()
 
         # create MLP
-        layer_sizes = np.int32([76800, 32, 4])
+        layer_sizes = np.int32([38400, 32, 4])
         ann = cv2.ml.ANN_MLP_create()
         ann.setLayerSizes(layer_sizes)
         ann.setTrainMethod(cv2.ml.ANN_MLP_BACKPROP)

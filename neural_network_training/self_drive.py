@@ -11,7 +11,7 @@ from picamera.array import PiRGBArray
 class NeuralNetwork:
 
     def __init__(self):
-        layer_sizes = np.int32([76800, 32, 4])
+        layer_sizes = np.int32([38400, 32, 4])
         self.ann = cv2.ml.ANN_MLP_create()
         self.ann.setLayerSizes(layer_sizes)
 
@@ -35,13 +35,13 @@ class CarControl:
     def steer(self, prediction):
         if prediction == 1:
             # speed left wheel, left dir, speed right wheel, right dir
-            self.car.set_motors(0.15, 0, 0.3, 0)
+            self.car.set_motors(0.33, 0, 0.4, 0)
             print("Left")
         elif prediction == 2:
             self.car.set_motors(0.3, 0, 0.3, 0)
             print("Forward")
         elif prediction == 3:
-            self.car.set_motors(0.15, 0, 0.3, 0)
+            self.car.set_motors(0.4, 0, 0.33, 0)
             print("Right")
         else:
             self.stop()
@@ -62,9 +62,9 @@ class StreamFrames:
         # initialize the camera and grab a reference to the raw camera capture
         print ("Initialising Camera ...")
         camera = picamera.PiCamera()
-        camera.resolution = (640, 480)
-        camera.framerate = 60
-        raw_capture = PiRGBArray(camera, size=(640, 480))
+        camera.resolution = (320, 240)
+        camera.framerate = 32
+        raw_capture = PiRGBArray(camera, size=(320, 240))
         time.sleep(1)
         # stream video frames one by one
         print ("Camera Initialised ...")
@@ -76,10 +76,10 @@ class StreamFrames:
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
                 # lower half of the image
-                half_gray = gray[360:480, :]
+                half_gray = gray[120:240, :]
 
                 # reshape image
-                image_array = half_gray.reshape(1, 76800).astype(np.float32)
+                image_array = half_gray.reshape(1, 38400).astype(np.float32)
 
                 # reset camera for next frame
                 raw_capture.truncate(0)
