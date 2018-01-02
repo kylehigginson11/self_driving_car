@@ -27,9 +27,9 @@ while not joy.Back():
     if joy.A():
         car.reverse()
     elif joy.B():
-        car.set_motors(0.4, 0, 0.33, 0)
+        car.set_motors(0.4, 0, 0.332, 0)
     elif joy.X():
-        car.set_motors(0.3, 0, 0.4, 0)
+        car.set_motors(0.332, 0, 0.4, 0)
     elif joy.Y():
         car.set_motors(0.4, 0, 0.4, 0)
     # DPAD, up, down, left or right

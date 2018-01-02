@@ -35,13 +35,13 @@ class CarControl:
     def steer(self, prediction):
         if prediction == 1:
             # speed left wheel, left dir, speed right wheel, right dir
-            self.car.set_motors(0.33, 0, 0.4, 0)
+            self.car.set_motors(0.324, 0, 0.4, 0)
             print("Left")
         elif prediction == 2:
             self.car.set_motors(0.3, 0, 0.3, 0)
             print("Forward")
         elif prediction == 3:
-            self.car.set_motors(0.4, 0, 0.33, 0)
+            self.car.set_motors(0.4, 0, 0.324, 0)
             print("Right")
         else:
             self.stop()
