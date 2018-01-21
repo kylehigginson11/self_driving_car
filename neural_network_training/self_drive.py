@@ -35,13 +35,13 @@ class CarControl:
     def steer(self, prediction):
         if prediction == 1:
             # speed left wheel, left dir, speed right wheel, right dir
-            self.car.set_motors(0.324, 0, 0.4, 0)
+            self.car.set_motors(0.3, 0, 0.4, 0)
             print("Left")
         elif prediction == 2:
             self.car.set_motors(0.3, 0, 0.3, 0)
             print("Forward")
         elif prediction == 3:
-            self.car.set_motors(0.4, 0, 0.324, 0)
+            self.car.set_motors(0.4, 0, 0.3, 0)
             print("Right")
         else:
             self.stop()
@@ -76,7 +76,7 @@ class StreamFrames:
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
                 # lower half of the image
-                half_gray = gray[120:240, :]
+                half_gray = gray[80:200, :]
 
                 # reshape image
                 image_array = half_gray.reshape(1, 38400).astype(np.float32)

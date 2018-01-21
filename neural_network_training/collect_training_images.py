@@ -72,7 +72,7 @@ class CollectTrainingImages:
                 gray_image = cv2.cvtColor(frame.array, cv2.COLOR_BGR2GRAY)
 
                 # select lower half of the image
-                lower_half = gray_image[120:240, :]
+                lower_half = gray_image[80:200, :]
 
                 # save streamed images
                 cv2.imwrite('training_images/frame{:>05}.jpg'.format(frame_number), lower_half)
@@ -91,7 +91,7 @@ class CollectTrainingImages:
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[1]))
                     saved_frame += 1
-                    self.car.set_motors(0.324, 0, 0.4, 0)
+                    self.car.set_motors(0.3, 0, 0.4, 0)
                 elif self.joy.Y():
                     print("Forward")
                     saved_frame += 1
@@ -105,7 +105,7 @@ class CollectTrainingImages:
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[3]))
                     saved_frame += 1
-                    self.car.set_motors(0.4, 0, 0.324, 0)
+                    self.car.set_motors(0.4, 0, 0.3, 0)
                 elif self.joy.dpadDown():
                     print ('exit')
                     self.car.stop()
