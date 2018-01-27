@@ -6,6 +6,15 @@ import math, time
 from car_control.car import Car
 import picamera
 from picamera.array import PiRGBArray
+import logging
+
+
+logger = logging.getLogger('driverless_car')
+handler = logging.FileHandler('/var/log/testdaemon/driverless_car.log')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.WARNING)
 
 
 class NeuralNetwork:
@@ -17,9 +26,9 @@ class NeuralNetwork:
 
     def create(self):
         # load neural network from file
-        print ("Loading MLP ...")
+        logger.info("Loading MLP ...")
         self.ann = cv2.ml.ANN_MLP_load('mlp_xml/mlp.xml')
-        print ("MLP loaded ...")
+        logger.info("MLP loaded ...")
 
     def predict(self, samples):
         # make prediction on passed data
@@ -36,13 +45,13 @@ class CarControl:
         if prediction == 1:
             # speed left wheel, left dir, speed right wheel, right dir
             self.car.set_motors(0.3, 0, 0.4, 0)
-            print("Left")
+            # print("Left")
         elif prediction == 2:
             self.car.set_motors(0.3, 0, 0.3, 0)
-            print("Forward")
+            # print("Forward")
         elif prediction == 3:
             self.car.set_motors(0.4, 0, 0.3, 0)
-            print("Right")
+            # print("Right")
         else:
             self.stop()
 
@@ -60,14 +69,14 @@ class StreamFrames:
     def __init__(self):
 
         # initialize the camera and grab a reference to the raw camera capture
-        print ("Initialising Camera ...")
+        logger.info("Initialising Camera ...")
         camera = picamera.PiCamera()
         camera.resolution = (320, 240)
         camera.framerate = 32
         raw_capture = PiRGBArray(camera, size=(320, 240))
         time.sleep(1)
         # stream video frames one by one
-        print ("Camera Initialised ...")
+        logger.info("Camera Initialised ...")
 
         try:
             for frame in camera.capture_continuous(raw_capture, 'bgr', use_video_port=True):
@@ -86,13 +95,13 @@ class StreamFrames:
 
                 # neural network makes prediction
                 prediction = self.model.predict(image_array)
-                print (prediction)
+                # print (prediction)
 
                 self.car.steer(prediction)
         finally:
             cv2.destroyAllWindows()
             self.car.stop()
-            print ("Connection closed on thread 1")
+            logger.info("Connection closed on thread 1")
 
 
 if __name__ == '__main__':

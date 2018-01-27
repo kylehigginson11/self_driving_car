@@ -10,6 +10,8 @@ from picamera.array import PiRGBArray
 import time
 from car_control.car import Car
 from xbox_control import xbox
+import logging
+
 
 class CollectTrainingImages:
 
@@ -18,6 +20,12 @@ class CollectTrainingImages:
     # initialize the camera and grab a reference to the raw camera capture
     camera = PiCamera()
     rawCapture = PiRGBArray(camera, size=(320, 240))
+    logger = logging.getLogger('driverless_car')
+    handler = logging.FileHandler('/var/log/testdaemon/driverless_car_data_collection.log')
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.WARNING)
 
     def __init__(self):
 
@@ -57,7 +65,7 @@ class CollectTrainingImages:
         total_frame = 0
 
         # collect images for training
-        print ('Start controlling car ...')
+        self.logger.info('Start controlling car ...')
 
         # get current amount of ticks
         time_start = cv2.getTickCount()
@@ -87,27 +95,25 @@ class CollectTrainingImages:
                 self.rawCapture.truncate(0)
 
                 if self.joy.X():
-                    print("Forward Left")
+                    # print("Forward Left")
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[1]))
                     saved_frame += 1
                     self.car.set_motors(0.3, 0, 0.4, 0)
                 elif self.joy.Y():
-                    print("Forward")
+                    # print("Forward")
                     saved_frame += 1
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[2]))
                     self.car.set_motors(0.3, 0, 0.3, 0)
-                    #if saved_frame > 30:
-                    #    cv2.imwrite('sample.jpg', lower_half)
                 elif self.joy.B():
-                    print("Forward Right")
+                    # print("Forward Right")
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[3]))
                     saved_frame += 1
                     self.car.set_motors(0.4, 0, 0.3, 0)
                 elif self.joy.dpadDown():
-                    print ('exit')
+                    self.logger.info('Keypad down pressed, exiting')
                     self.car.stop()
                     break
                 else:
@@ -121,17 +127,17 @@ class CollectTrainingImages:
             time_end = cv2.getTickCount()
             # calculate streaming duration
             total_time = (time_end - time_start) / cv2.getTickFrequency()
-            print ('Collection Time:', total_time)
+            self.logger.info('Collection Time:', total_time)
 
-            print(images.shape)
-            print(train_labels.shape)
-            print ('Frames:', total_frame)
-            print ('Saved Frames:', saved_frame)
+            self.logger.info(images.shape)
+            self.logger.info(train_labels.shape)
+            self.logger.info('Frames:', total_frame)
+            self.logger.info('Saved Frames:', saved_frame)
 
         finally:
             self.car.stop()
             self.joy.close()
-            print ('Training Complete')
+            self.logger.info('Training Complete')
 
 
 if __name__ == '__main__':

@@ -2,11 +2,7 @@
 # Copyright (c) 1996-2012 My Company.
 # All rights reserved.
 #
-# Author: Bob Bobson, 2012
-#
-# Please send feedback to bob@bob.com
-#
-# /etc/init.d/testdaemon
+# /etc/init.d/driverless_car
 #
 ### BEGIN INIT INFO
 # Provides: testdaemon
@@ -26,16 +22,18 @@ case "$1" in
   start)
     echo "Starting server"
     # Start the daemon
-    python /usr/share/testdaemon/driverless_car_daemon.py start
+    cd ~/repos/self_driving_car/neural_network_training/
+    sudo python3 self_drive.py &
+    LASTPID=$!
     ;;
   stop)
     echo "Stopping server"
     # Stop the daemon
-    python /usr/share/testdaemon/driverless_car_daemon.py stop
+    kill $LASTPID
     ;;
   restart)
     echo "Restarting server"
-    python /usr/share/testdaemon/driverless_car_daemon.py restart
+    # python /usr/share/testdaemon/driverless_car_daemon.py restart
     ;;
   *)
     # Refuse to do other stuff
