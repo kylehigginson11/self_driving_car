@@ -10,7 +10,7 @@ import logging
 
 
 logger = logging.getLogger('driverless_car')
-handler = logging.FileHandler('/var/log/testdaemon/driverless_car.log')
+handler = logging.FileHandler('/var/log/driverless_car/driverless_car.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)

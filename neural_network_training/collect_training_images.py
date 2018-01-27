@@ -21,7 +21,7 @@ class CollectTrainingImages:
     camera = PiCamera()
     rawCapture = PiRGBArray(camera, size=(320, 240))
     logger = logging.getLogger('driverless_car')
-    handler = logging.FileHandler('/var/log/testdaemon/driverless_car_data_collection.log')
+    handler = logging.FileHandler('/var/log/driverless_car/driverless_car_data_collection.log')
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
