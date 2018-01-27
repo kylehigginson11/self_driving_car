@@ -16,6 +16,18 @@ case "$1" in
     echo "Restarting server"
     # python /usr/share/testdaemon/driverless_car_daemon.py restart
     ;;
+  obstacle)
+    cd /home/pi/repos/self_driving_car/utilities/
+    sudo python3 obstacle_checker.py
+    ;;
+  capture)
+    export CLOUDINARY_CLOUD_NAME="dtumd2ht6"
+    export CLOUDINARY_API_KEY="849559948829221"
+    export CLOUDINARY_API_SECRET="XgZ59pd95tt8QVnWfku36zNuMKg"
+    export CLOUDINARY_URL=cloudinary://849559948829221:XgZ59pd95tt8QVnWfku36zNuMKg@dtumd2ht6
+    cd /home/pi/repos/self_driving_car/utilities/
+    sudo python3 capture_image.py
+    ;;
   *)
     # Refuse to do other stuff
     echo "Usage: /etc/init.d/testdaemon.sh {start|stop|restart}"
