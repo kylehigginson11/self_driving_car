@@ -26,6 +26,7 @@ import subprocess
 import os
 import select
 import time
+import sys
 
 class Joystick:
 
@@ -69,7 +70,9 @@ class Joystick:
         # if the controller wasn't found, then halt
         if not found:
             self.close()
-            raise IOError('Unable to detect Xbox controller/receiver - Run python as sudo')
+            sys.stdout.write("Failed")
+            sys.stdout.flush()
+            #raise IOError('Unable to detect Xbox controller/receiver - Run python as sudo')
 
     """Used by all Joystick methods to read the most recent events from xboxdrv.
     The refreshRate determines the maximum frequency with which events are checked.

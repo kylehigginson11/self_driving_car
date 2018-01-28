@@ -11,18 +11,18 @@ def convert_float(n):
 joy = xbox.Joystick()
 car = Car(9, 6)
 
-print ("Start controlling car remotely, press back to quit ...")
+#print ("Start controlling car remotely, press back to quit ...")
 # Loop until back button is pressed
 while not joy.Back():
     # Connection status
-    if joy.connected():
-        print ("Connected   "),
-    else:
-        print ("Disconnected"),
+    # if joy.connected():
+    #     print ("Connected   "),
+    # else:
+    #     print ("Disconnected"),
     # Left analog stick
-    print ("Left Stick X: {}, Left Stick Y: {}".format(convert_float(joy.leftX()), convert_float(joy.leftY()))),
+    #print ("Left Stick X: {}, Left Stick Y: {}".format(convert_float(joy.leftX()), convert_float(joy.leftY()))),
     # Right trigger
-    print ("Right Trigger: ", convert_float(joy.rightTrigger())),
+    #print ("Right Trigger: ", convert_float(joy.rightTrigger())),
     # A, B, X, Y buttons
     if joy.A():
         car.reverse()
@@ -45,6 +45,6 @@ while not joy.Back():
         car.stop()
 
     # Move cursor back to start of line
-    print chr(13),
+    #print chr(13),
 # Close out when done
 joy.close()

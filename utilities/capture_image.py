@@ -46,6 +46,7 @@ def cleanup_cloudinary():
 def take_picture(public_id):
     # print ("Capturing image, say cheese!")
     camera = picamera.PiCamera()
+    camera.rotation = 180
     camera.capture('upload.jpg')
     time.sleep(1)
     camera.close()
