@@ -8,7 +8,7 @@ import logging
 
 class TrainMLP:
 
-    logger = logging.getLogger('driverless_car')
+    logger = logging.getLogger()
     handler = logging.FileHandler('/var/log/driverless_car/driverless_car_training.log')
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
     handler.setFormatter(formatter)

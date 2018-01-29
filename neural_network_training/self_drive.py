@@ -9,7 +9,7 @@ from picamera.array import PiRGBArray
 import logging
 
 
-logger = logging.getLogger('driverless_car')
+logger = logging.getLogger()
 handler = logging.FileHandler('/var/log/driverless_car/driverless_car.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 handler.setFormatter(formatter)
@@ -42,18 +42,22 @@ class CarControl:
         self.car = Car(9, 6)
 
     def steer(self, prediction):
+        distance = self.car.get_distance()
         if prediction == 1:
             # speed left wheel, left dir, speed right wheel, right dir
-            self.car.set_motors(0.3, 0, 0.4, 0)
+            self.car.set_motors(0.315, 0, 0.4, 0)
             # print("Left")
         elif prediction == 2:
             self.car.set_motors(0.3, 0, 0.3, 0)
             # print("Forward")
         elif prediction == 3:
-            self.car.set_motors(0.4, 0, 0.3, 0)
+            self.car.set_motors(0.4, 0, 0.315, 0)
             # print("Right")
         else:
-            self.stop()
+            self.car.stop()
+
+        if distance < 15:
+            self.car.stop()
 
     def stop(self):
         self.car.stop()
@@ -85,7 +89,7 @@ class StreamFrames:
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
                 # lower half of the image
-                half_gray = gray[80:200, :]
+                half_gray = gray[120:240, :]
 
                 # reshape image
                 image_array = half_gray.reshape(1, 38400).astype(np.float32)

@@ -20,7 +20,7 @@ class CollectTrainingImages:
     # initialize the camera and grab a reference to the raw camera capture
     camera = PiCamera()
     rawCapture = PiRGBArray(camera, size=(320, 240))
-    logger = logging.getLogger('driverless_car')
+    logger = logging.getLogger()
     handler = logging.FileHandler('/var/log/driverless_car/driverless_car_data_collection.log')
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
     handler.setFormatter(formatter)
@@ -80,7 +80,7 @@ class CollectTrainingImages:
                 gray_image = cv2.cvtColor(frame.array, cv2.COLOR_BGR2GRAY)
 
                 # select lower half of the image
-                lower_half = gray_image[80:200, :]
+                lower_half = gray_image[120:240, :]
 
                 # save streamed images
                 cv2.imwrite('training_images/frame{:>05}.jpg'.format(frame_number), lower_half)
@@ -99,7 +99,7 @@ class CollectTrainingImages:
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[1]))
                     saved_frame += 1
-                    self.car.set_motors(0.3, 0, 0.4, 0)
+                    self.car.set_motors(0.315, 0, 0.4, 0)
                 elif self.joy.Y():
                     # print("Forward")
                     saved_frame += 1
@@ -111,7 +111,7 @@ class CollectTrainingImages:
                     image_array = np.vstack((image_array, temp_array))
                     label_array = np.vstack((label_array, self.k[3]))
                     saved_frame += 1
-                    self.car.set_motors(0.4, 0, 0.3, 0)
+                    self.car.set_motors(0.4, 0, 0.315, 0)
                 elif self.joy.dpadDown():
                     self.logger.info('Keypad down pressed, exiting')
                     self.car.stop()
