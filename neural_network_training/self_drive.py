@@ -9,12 +9,9 @@ from picamera.array import PiRGBArray
 import logging
 
 
-logger = logging.getLogger()
-handler = logging.FileHandler('/var/log/driverless_car/driverless_car.log')
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.WARNING)
+# Configure logger
+logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level=logging.DEBUG,
+                    format="%(asctime)s:%(levelname)s:%(message)s")
 
 
 class NeuralNetwork:
@@ -26,9 +23,9 @@ class NeuralNetwork:
 
     def create(self):
         # load neural network from file
-        logger.info("Loading MLP ...")
+        logging.info("Loading MLP ...")
         self.ann = cv2.ml.ANN_MLP_load('mlp_xml/mlp.xml')
-        logger.info("MLP loaded ...")
+        logging.info("MLP loaded ...")
 
     def predict(self, samples):
         # make prediction on passed data
@@ -73,14 +70,15 @@ class StreamFrames:
     def __init__(self):
 
         # initialize the camera and grab a reference to the raw camera capture
-        logger.info("Initialising Camera ...")
+        logging.info("Initialising Camera ...")
         camera = picamera.PiCamera()
         camera.resolution = (320, 240)
         camera.framerate = 32
+        camera.rotation = 180
         raw_capture = PiRGBArray(camera, size=(320, 240))
         time.sleep(1)
         # stream video frames one by one
-        logger.info("Camera Initialised ...")
+        logging.info("Camera Initialised ...")
 
         try:
             for frame in camera.capture_continuous(raw_capture, 'bgr', use_video_port=True):
@@ -89,7 +87,7 @@ class StreamFrames:
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
                 # lower half of the image
-                half_gray = gray[120:240, :]
+                half_gray = gray[100:220, :]
 
                 # reshape image
                 image_array = half_gray.reshape(1, 38400).astype(np.float32)
@@ -105,7 +103,7 @@ class StreamFrames:
         finally:
             cv2.destroyAllWindows()
             self.car.stop()
-            logger.info("Connection closed on thread 1")
+            logging.info("Connection closed on thread 1")
 
 
 if __name__ == '__main__':

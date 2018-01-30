@@ -1,6 +1,5 @@
 import sys
 sys.path.append('../')
-
 import numpy as np
 import cv2
 import time
@@ -12,20 +11,17 @@ from car_control.car import Car
 from xbox_control import xbox
 import logging
 
+# Configure logger
+logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level=logging.DEBUG,
+                    format="%(asctime)s:%(levelname)s:%(message)s")
+
 
 class CollectTrainingImages:
-
     car = Car(9, 6)
     joy = xbox.Joystick()
     # initialize the camera and grab a reference to the raw camera capture
     camera = PiCamera()
     rawCapture = PiRGBArray(camera, size=(320, 240))
-    logger = logging.getLogger()
-    handler = logging.FileHandler('/var/log/driverless_car/driverless_car_data_collection.log')
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.WARNING)
 
     def __init__(self):
 
@@ -65,7 +61,7 @@ class CollectTrainingImages:
         total_frame = 0
 
         # collect images for training
-        self.logger.info('Start controlling car ...')
+        logging.info('Start controlling car ...')
 
         # get current amount of ticks
         time_start = cv2.getTickCount()
@@ -80,7 +76,7 @@ class CollectTrainingImages:
                 gray_image = cv2.cvtColor(frame.array, cv2.COLOR_BGR2GRAY)
 
                 # select lower half of the image
-                lower_half = gray_image[120:240, :]
+                lower_half = gray_image[100:220, :]
 
                 # save streamed images
                 cv2.imwrite('training_images/frame{:>05}.jpg'.format(frame_number), lower_half)
@@ -113,7 +109,7 @@ class CollectTrainingImages:
                     saved_frame += 1
                     self.car.set_motors(0.4, 0, 0.315, 0)
                 elif self.joy.dpadDown():
-                    self.logger.info('Keypad down pressed, exiting')
+                    logging.info('Keypad down pressed, exiting')
                     self.car.stop()
                     break
                 else:
@@ -127,17 +123,17 @@ class CollectTrainingImages:
             time_end = cv2.getTickCount()
             # calculate streaming duration
             total_time = (time_end - time_start) / cv2.getTickFrequency()
-            self.logger.info('Collection Time:', total_time)
+            logging.info('Collection Time:', total_time)
 
-            self.logger.info(images.shape)
-            self.logger.info(train_labels.shape)
-            self.logger.info('Frames:', total_frame)
-            self.logger.info('Saved Frames:', saved_frame)
+            logging.info(images.shape)
+            logging.info(train_labels.shape)
+            logging.info('Frames:', total_frame)
+            logging.info('Saved Frames:', saved_frame)
 
         finally:
             self.car.stop()
             self.joy.close()
-            self.logger.info('Training Complete')
+            logging.info('Training Complete')
 
 
 if __name__ == '__main__':
