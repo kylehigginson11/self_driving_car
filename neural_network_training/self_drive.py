@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('../')
 import cv2
 import numpy as np
@@ -8,14 +9,12 @@ import picamera
 from picamera.array import PiRGBArray
 import logging
 
-
 # Configure logger
 logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level=logging.DEBUG,
                     format="%(asctime)s:%(levelname)s:%(message)s")
 
 
 class NeuralNetwork:
-
     def __init__(self):
         layer_sizes = np.int32([38400, 32, 4])
         self.ann = cv2.ml.ANN_MLP_create()
@@ -35,29 +34,55 @@ class NeuralNetwork:
 
 class CarControl:
 
+    speed = 0.3
+
     def __init__(self):
         self.car = Car(9, 6)
 
-    def steer(self, prediction):
+    def steer(self, prediction, sign_decision):
         distance = self.car.get_distance()
-        if prediction == 1:
-            # speed left wheel, left dir, speed right wheel, right dir
-            self.car.set_motors(0.315, 0, 0.4, 0)
-            # print("Left")
-        elif prediction == 2:
-            self.car.set_motors(0.3, 0, 0.3, 0)
-            # print("Forward")
-        elif prediction == 3:
-            self.car.set_motors(0.4, 0, 0.315, 0)
-            # print("Right")
+
+        if distance > 15:
+            # if a sign is not detcted (sign_decision will be 0)
+            if sign_decision == 0:
+                if prediction == 1:
+                    # speed left wheel, left dir, speed right wheel, right dir
+                    self.car.set_motors(0.315, 0, 0.4, 0)
+                    # print("Left")
+                elif prediction == 2:
+                    self.car.set_motors(self.speed, 0, self.speed, 0)
+                    # print("Forward")
+                elif prediction == 3:
+                    self.car.set_motors(0.4, 0, 0.315, 0)
+                    # print("Right")
+                else:
+                    self.car.stop()
+            elif sign_decision == 1:
+                # this is a left arrow sign
+                self.car.stop()
         else:
             self.car.stop()
 
-        if distance < 15:
-            self.car.stop()
-
-    def stop(self):
+    def stop_car(self):
         self.car.stop()
+
+    def change_speed(self, speed):
+        self.speed = speed
+
+
+class SignDetector:
+    def __init__(self):
+        # loading sign classifiers
+        logging.info("Loading sign classifiers")
+        self.left_sign_cascade = cv2.CascadeClassifier('../classifier_training/working_classifiers/left_sign_classifier.xml')
+
+    def detcted_sign(self, image):
+        left_sign_rect = self.left_sign_cascade.detectMultiScale(image, 1.3, 5)
+
+        if len(left_sign_rect) != 0:
+            return 1
+        else:
+            return 0
 
 
 class StreamFrames:
@@ -65,7 +90,9 @@ class StreamFrames:
     model = NeuralNetwork()
     model.create()
 
-    car = CarControl()
+    # initialise car and sign detector
+    car_controller = CarControl()
+    sign_detector = SignDetector()
 
     def __init__(self):
 
@@ -86,6 +113,9 @@ class StreamFrames:
                 image.setflags(write=1)
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+                sign_segment = gray[:, 200:320]
+                sign_decision = self.sign_detector.detcted_sign(sign_segment)
+
                 # lower half of the image
                 half_gray = gray[100:220, :]
 
@@ -99,10 +129,10 @@ class StreamFrames:
                 prediction = self.model.predict(image_array)
                 # print (prediction)
 
-                self.car.steer(prediction)
+                self.car_controller.steer(prediction, sign_decision)
         finally:
             cv2.destroyAllWindows()
-            self.car.stop()
+            self.car_controller.stop_car()
             logging.info("Connection closed on thread 1")
 
 

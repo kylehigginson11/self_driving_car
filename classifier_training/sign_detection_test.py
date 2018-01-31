@@ -2,19 +2,21 @@ import cv2
 import numpy as np
 from time import sleep
 import sys
+sys.path.append('../')
 from picamera import PiCamera
 from picamera.array import PiRGBArray
-from car import Car
+from car_control.car import Car
 
 print ("Loading classifier")
-sign_cascade = cv2.CascadeClassifier('./left_sign_classifier.xml')
+sign_cascade = cv2.CascadeClassifier('working_classifiers/left_sign_classifier.xml')
 
 car = Car(9, 6)
 
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
 camera.resolution = (320, 240)
-camera.framerate = 64
+camera.framerate = 32
+camera.rotation = 180
 rawCapture = PiRGBArray(camera, size=(320, 240))
 
 try:
@@ -35,7 +37,7 @@ try:
                 print ("Object in front")
                 car.stop()
             else:
-                car.set_motors(0.4, 0, 0.4, 0)
+                car.set_motors(0.3, 0, 0.3, 0)
         else:
             print ("Sign detection")
             car.stop()
