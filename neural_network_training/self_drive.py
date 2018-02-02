@@ -15,6 +15,7 @@ logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level
 
 
 class NeuralNetwork:
+
     def __init__(self):
         layer_sizes = np.int32([38400, 32, 4])
         self.ann = cv2.ml.ANN_MLP_create()
@@ -60,6 +61,8 @@ class CarControl:
             elif sign_decision == 1:
                 # this is a left arrow sign
                 self.car.stop()
+            elif sign_decision == 2:
+                self.speed = 0.5
         else:
             self.car.stop()
 
@@ -71,16 +74,25 @@ class CarControl:
 
 
 class SignDetector:
+
+    left_sign_path = "../classifier_training/working_classifiers/left_sign_classifier.xml"
+    speed_sign_path = "../classifier_training/working_classifiers/40_speed_limit_classifier.xml"
+
     def __init__(self):
         # loading sign classifiers
         logging.info("Loading sign classifiers")
-        self.left_sign_cascade = cv2.CascadeClassifier('../classifier_training/working_classifiers/left_sign_classifier.xml')
+        self.left_sign_cascade = cv2.CascadeClassifier(self.left_sign_path)
+        self.speed_sign_cascade = cv2.CascadeClassifier(self.speed_sign_path)
 
     def detcted_sign(self, image):
         left_sign_rect = self.left_sign_cascade.detectMultiScale(image, 1.3, 5)
+        speed_sign_rect = self.speed_sign_cascade.detectMultiScale(image, 1.3, 5)
 
         if len(left_sign_rect) != 0:
             return 1
+        elif len(speed_sign_rect) != 0:
+            print("40 detected")
+            return 2
         else:
             return 0
 
@@ -113,7 +125,7 @@ class StreamFrames:
                 image.setflags(write=1)
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-                sign_segment = gray[:, 200:320]
+                sign_segment = gray[30:150, 200:320]
                 sign_decision = self.sign_detector.detcted_sign(sign_segment)
 
                 # lower half of the image
