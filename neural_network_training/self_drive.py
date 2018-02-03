@@ -62,7 +62,9 @@ class CarControl:
                 # this is a left arrow sign
                 self.car.stop()
             elif sign_decision == 2:
-                self.speed = 0.5
+                self.speed = 0.3
+            elif sign_decision == 3:
+                self.speed = 0.6
         else:
             self.car.stop()
 
@@ -76,23 +78,30 @@ class CarControl:
 class SignDetector:
 
     left_sign_path = "../classifier_training/working_classifiers/left_sign_classifier.xml"
-    speed_sign_path = "../classifier_training/working_classifiers/40_speed_limit_classifier.xml"
+    forty_speed_sign_path = "../classifier_training/working_classifiers/forty_speed_limit_classifier.xml"
+    national_speed_sign_path = "../classifier_training/working_classifiers/national_speed_limit_classifier.xml"
 
     def __init__(self):
         # loading sign classifiers
         logging.info("Loading sign classifiers")
         self.left_sign_cascade = cv2.CascadeClassifier(self.left_sign_path)
-        self.speed_sign_cascade = cv2.CascadeClassifier(self.speed_sign_path)
+        self.forty_speed_sign_cascade = cv2.CascadeClassifier(self.forty_speed_sign_path)
+        self.national_speed_sign_cascade = cv2.CascadeClassifier(self.national_speed_sign_path)
 
     def detcted_sign(self, image):
         left_sign_rect = self.left_sign_cascade.detectMultiScale(image, 1.3, 5)
-        speed_sign_rect = self.speed_sign_cascade.detectMultiScale(image, 1.3, 5)
+        forty_speed_sign_rect = self.forty_speed_sign_cascade.detectMultiScale(image, 1.3, 5)
+        national_speed_sign_rect = self.national_speed_sign_cascade.detectMultiScale(image, 1.3, 5)
 
         if len(left_sign_rect) != 0:
+            print("Left sign detected")
             return 1
-        elif len(speed_sign_rect) != 0:
-            print("40 detected")
+        elif len(forty_speed_sign_rect) != 0:
+            print("40 speed limit sign detected")
             return 2
+        elif len(national_speed_sign_rect) != 0:
+            print("National speed limit sign detected")
+            return 3
         else:
             return 0
 
