@@ -8,7 +8,7 @@ from picamera.array import PiRGBArray
 from car_control.car import Car
 
 print ("Loading classifier")
-sign_cascade = cv2.CascadeClassifier('working_classifiers/forty_speed_limit_classifier.xml')
+sign_cascade = cv2.CascadeClassifier('working_classifiers/thirty_speed_limit_classifier.xml')
 
 car = Car(9, 6)
 
@@ -30,17 +30,21 @@ try:
         image = cv2.resize(image, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
 
         left_sign_rect = sign_cascade.detectMultiScale(image, 1.3, 5)
+        
+        #if len(left_sign_rect) != 0:
+        #    print(left_sign_rect[0][2] *left_sign_rect[0][3])
+        #4500 is close
 
         print (left_sign_rect)
-        if len(left_sign_rect) == 0:
-            if obj_distance is not None and obj_distance < 15:
-                print ("Object in front")
-                car.stop()
-            else:
-                car.set_motors(0.2, 0, 0.2, 0)
-        else:
-            print ("Sign detection")
-            car.stop()
+        #if len(left_sign_rect) == 0:
+        #    if obj_distance is not None and obj_distance < 15:
+        #        print ("Object in front")
+        #        car.stop()
+        #    else:
+        #        car.set_motors(0.2, 0, 0.2, 0)
+        #else:
+        #    print ("Sign detection")
+        #    car.stop()
 
         rawCapture.truncate(0)
         c = cv2.waitKey(1)

@@ -10,6 +10,7 @@ import time
 from car_control.car import Car
 from xbox_control import xbox
 import logging
+from datetime import datetime
 
 # Configure logger
 logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level=logging.DEBUG,
@@ -17,6 +18,7 @@ logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level
 
 
 class CollectTrainingImages:
+
     car = Car(9, 6)
     joy = xbox.Joystick()
     # initialize the camera and grab a reference to the raw camera capture
@@ -26,15 +28,15 @@ class CollectTrainingImages:
     def __init__(self):
 
         # create labels, 4 possible directions
-        self.k = np.zeros((4, 4), 'float')
+        self.array = np.zeros((4, 4), 'float')
         for i in range(4):
-            self.k[i, i] = 1
+            self.array[i, i] = 1
         self.temp_label = np.zeros((1, 4), 'float')
         self.send_inst = True
         # initiate camera
         self.setup_camera()
         # call method to start image collection
-        self.collect_images()
+        self.stream_frames()
 
     def setup_camera(self):
         # initialize the camera and grab a reference to the raw camera capture
@@ -55,7 +57,7 @@ class CollectTrainingImages:
         except IOError as e:
             print(e)
 
-    def collect_images(self):
+    def stream_frames(self):
 
         saved_frame = 0
         total_frame = 0
@@ -64,7 +66,7 @@ class CollectTrainingImages:
         logging.info('Start controlling car ...')
 
         # get current amount of ticks
-        time_start = cv2.getTickCount()
+        time_start = datetime.now()
         image_array = np.zeros((1, 38400))
         label_array = np.zeros((1, 4), 'float')
 
@@ -82,7 +84,7 @@ class CollectTrainingImages:
                 cv2.imwrite('training_images/frame{:>05}.jpg'.format(frame_number), lower_half)
 
                 # reshape the roi image into one numpy array
-                temp_array = lower_half.reshape(1, 38400).astype(np.float32)
+                frame_array = lower_half.reshape(1, 38400).astype(np.float32)
 
                 # increment frame number and total frames
                 frame_number += 1
@@ -92,20 +94,20 @@ class CollectTrainingImages:
 
                 if self.joy.X():
                     # print("Forward Left")
-                    image_array = np.vstack((image_array, temp_array))
-                    label_array = np.vstack((label_array, self.k[1]))
+                    image_array = np.vstack((image_array, frame_array))
+                    label_array = np.vstack((label_array, self.array[1]))
                     saved_frame += 1
                     self.car.set_motors(0.315, 0, 0.4, 0)
                 elif self.joy.Y():
                     # print("Forward")
                     saved_frame += 1
-                    image_array = np.vstack((image_array, temp_array))
-                    label_array = np.vstack((label_array, self.k[2]))
+                    image_array = np.vstack((image_array, frame_array))
+                    label_array = np.vstack((label_array, self.array[2]))
                     self.car.set_motors(0.3, 0, 0.3, 0)
                 elif self.joy.B():
                     # print("Forward Right")
-                    image_array = np.vstack((image_array, temp_array))
-                    label_array = np.vstack((label_array, self.k[3]))
+                    image_array = np.vstack((image_array, frame_array))
+                    label_array = np.vstack((label_array, self.array[3]))
                     saved_frame += 1
                     self.car.set_motors(0.4, 0, 0.315, 0)
                 elif self.joy.dpadDown():
@@ -116,19 +118,19 @@ class CollectTrainingImages:
                     self.car.stop()
 
             # save training images and labels
-            images = image_array[1:, :]
-            train_labels = label_array[1:, :]
-            self.save_training_data(train_images=images, train_labels=train_labels)
+            training_images = image_array[1:, :]
+            training_labels = label_array[1:, :]
+            self.save_training_data(train_images=training_images, train_labels=training_labels)
 
-            time_end = cv2.getTickCount()
-            # calculate streaming duration
-            total_time = (time_end - time_start) / cv2.getTickFrequency()
-            logging.info('Collection Time:', total_time)
+            time_end = datetime.now()
+            # calculate collection duration
+            total_time = (time_end - time_start).seconds
+            logging.info('Collection Time: ' + str(total_time) + 'seconds')
 
-            logging.info(images.shape)
-            logging.info(train_labels.shape)
-            logging.info('Frames:', total_frame)
-            logging.info('Saved Frames:', saved_frame)
+            logging.info(training_images.shape)
+            logging.info(training_labels.shape)
+            logging.info('Frames: ' + str(total_frame))
+            logging.info('Saved Frames: ' + str(saved_frame))
 
         finally:
             self.car.stop()

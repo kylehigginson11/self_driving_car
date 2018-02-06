@@ -8,6 +8,7 @@ from car_control.car import Car
 import picamera
 from picamera.array import PiRGBArray
 import logging
+from datetime import datetime
 
 # Configure logger
 logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level=logging.DEBUG,
@@ -24,7 +25,7 @@ class NeuralNetwork:
     def create(self):
         # load neural network from file
         logging.info("Loading MLP ...")
-        self.ann = cv2.ml.ANN_MLP_load('mlp_xml/mlp.xml')
+        self.ann = cv2.ml.ANN_MLP_load('neural_networks/neural_network.xml')
         logging.info("MLP loaded ...")
 
     def predict(self, samples):
@@ -64,7 +65,9 @@ class CarControl:
             elif sign_decision == 2:
                 self.speed = 0.3
             elif sign_decision == 3:
-                self.speed = 0.6
+                self.speed = 0.5
+            elif sign_decision == 4:
+                self.speed = 0.7
         else:
             self.car.stop()
 
@@ -78,6 +81,7 @@ class CarControl:
 class SignDetector:
 
     left_sign_path = "../classifier_training/working_classifiers/left_sign_classifier.xml"
+    thirty_speed_sign_path = "../classifier_training/working_classifiers/thirty_speed_limit_classifier.xml"
     forty_speed_sign_path = "../classifier_training/working_classifiers/forty_speed_limit_classifier.xml"
     national_speed_sign_path = "../classifier_training/working_classifiers/national_speed_limit_classifier.xml"
 
@@ -85,28 +89,34 @@ class SignDetector:
         # loading sign classifiers
         logging.info("Loading sign classifiers")
         self.left_sign_cascade = cv2.CascadeClassifier(self.left_sign_path)
+        self.thirty_speed_sign_path = cv2.CascadeClassifier(self.thirty_speed_sign_path)
         self.forty_speed_sign_cascade = cv2.CascadeClassifier(self.forty_speed_sign_path)
         self.national_speed_sign_cascade = cv2.CascadeClassifier(self.national_speed_sign_path)
 
     def detcted_sign(self, image):
         left_sign_rect = self.left_sign_cascade.detectMultiScale(image, 1.3, 5)
+        thirty_speed_sign_rect = self.thirty_speed_sign_path.detectMultiScale(image, 1.3, 5)
         forty_speed_sign_rect = self.forty_speed_sign_cascade.detectMultiScale(image, 1.3, 5)
         national_speed_sign_rect = self.national_speed_sign_cascade.detectMultiScale(image, 1.3, 5)
 
         if len(left_sign_rect) != 0:
             print("Left sign detected")
             return 1
+        elif len(thirty_speed_sign_rect) != 0:
+            print("30 speed limit sign detected")
+            return 2
         elif len(forty_speed_sign_rect) != 0:
             print("40 speed limit sign detected")
-            return 2
+            return 3
         elif len(national_speed_sign_rect) != 0:
             print("National speed limit sign detected")
-            return 3
+            return 4
         else:
             return 0
 
 
 class StreamFrames:
+    start_time = datetime.now()
     # load neural network
     model = NeuralNetwork()
     model.create()
@@ -154,6 +164,8 @@ class StreamFrames:
         finally:
             cv2.destroyAllWindows()
             self.car_controller.stop_car()
+            end_time = datetime.now()
+            logging.info("Total Journey duration: " + str(end_time-self.start_time) + 'seconds')
             logging.info("Connection closed on thread 1")
 
 
