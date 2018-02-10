@@ -10,6 +10,6 @@ camera.capture('sample_image.jpg')
 time.sleep(0.5)
 img = cv2.imread('sample_image.jpg', 0)
 
-lower_half = img[100:220, :]
+lower_half = img[30:150, 180:320]
 
 cv2.imwrite('sample_image.jpg', lower_half)

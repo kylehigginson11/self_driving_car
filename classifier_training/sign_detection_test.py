@@ -8,7 +8,7 @@ from picamera.array import PiRGBArray
 from car_control.car import Car
 
 print ("Loading classifier")
-sign_cascade = cv2.CascadeClassifier('working_classifiers/thirty_speed_limit_classifier.xml')
+sign_cascade = cv2.CascadeClassifier('working_classifiers/traffic_light_stop_classifier.xml')
 
 car = Car(9, 6)
 

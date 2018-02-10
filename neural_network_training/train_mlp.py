@@ -48,7 +48,7 @@ class TrainMLP:
         self.create_mlp(image_data_x, label_data_y)
 
     def create_mlp(self, images, labels):
-        # train test split, can use random_state=42 to set a seed here
+        # train test split, can use random_state=42 to set a seed here, splits data so can calculate accuracy
         x_train, x_test, y_train, y_test = train_test_split(images, labels, test_size=0.3)
 
         # set start time
@@ -60,6 +60,7 @@ class TrainMLP:
         ann_mlp.setLayerSizes(layer_sizes)
         ann_mlp.setTrainMethod(cv2.ml.ANN_MLP_BACKPROP)
         ann_mlp.setBackpropMomentumScale(0.0)
+        # set weight between each neuron
         ann_mlp.setBackpropWeightScale(0.001)
         ann_mlp.setTermCriteria((cv2.TERM_CRITERIA_COUNT | cv2.TERM_CRITERIA_EPS, 500, 0.0001))
         ann_mlp.setActivationFunction(cv2.ml.ANN_MLP_SIGMOID_SYM, 2, 1)

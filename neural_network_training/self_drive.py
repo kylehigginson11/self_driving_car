@@ -35,8 +35,7 @@ class NeuralNetwork:
 
 
 class CarControl:
-
-    speed = 0.3
+    speed = 0.4
 
     def __init__(self):
         self.car = Car(9, 6)
@@ -59,15 +58,20 @@ class CarControl:
                     # print("Right")
                 else:
                     self.car.stop()
-            elif sign_decision == 1:
-                # this is a left arrow sign
-                self.car.stop()
+            # elif sign_decision == 1:
+            #     # this is a left arrow sign
+            #     self.car.stop()
             elif sign_decision == 2:
                 self.speed = 0.3
+                self.car.set_motors(self.speed, 0, self.speed, 0)
             elif sign_decision == 3:
                 self.speed = 0.5
+                self.car.set_motors(self.speed, 0, self.speed, 0)
             elif sign_decision == 4:
                 self.speed = 0.7
+                self.car.set_motors(self.speed, 0, self.speed, 0)
+            elif sign_decision == 5:
+                self.car.stop()
         else:
             self.car.stop()
 
@@ -79,38 +83,43 @@ class CarControl:
 
 
 class SignDetector:
-
-    left_sign_path = "../classifier_training/working_classifiers/left_sign_classifier.xml"
+    # left_sign_path = "../classifier_training/working_classifiers/left_sign_classifier.xml"
     thirty_speed_sign_path = "../classifier_training/working_classifiers/thirty_speed_limit_classifier.xml"
-    forty_speed_sign_path = "../classifier_training/working_classifiers/forty_speed_limit_classifier.xml"
+    #forty_speed_sign_path = "../classifier_training/working_classifiers/forty_speed_limit_classifier.xml"
     national_speed_sign_path = "../classifier_training/working_classifiers/national_speed_limit_classifier.xml"
+    red_light_path = "../classifier_training/working_classifiers/red_light_classifier.xml"
 
     def __init__(self):
         # loading sign classifiers
         logging.info("Loading sign classifiers")
-        self.left_sign_cascade = cv2.CascadeClassifier(self.left_sign_path)
+        # self.left_sign_cascade = cv2.CascadeClassifier(self.left_sign_path)
         self.thirty_speed_sign_path = cv2.CascadeClassifier(self.thirty_speed_sign_path)
-        self.forty_speed_sign_cascade = cv2.CascadeClassifier(self.forty_speed_sign_path)
+        # self.forty_speed_sign_cascade = cv2.CascadeClassifier(self.forty_speed_sign_path)
         self.national_speed_sign_cascade = cv2.CascadeClassifier(self.national_speed_sign_path)
+        self.red_light_cascade = cv2.CascadeClassifier(self.red_light_path)
 
     def detcted_sign(self, image):
-        left_sign_rect = self.left_sign_cascade.detectMultiScale(image, 1.3, 5)
+        # left_sign_rect = self.left_sign_cascade.detectMultiScale(image, 1.3, 5)
         thirty_speed_sign_rect = self.thirty_speed_sign_path.detectMultiScale(image, 1.3, 5)
-        forty_speed_sign_rect = self.forty_speed_sign_cascade.detectMultiScale(image, 1.3, 5)
+        # forty_speed_sign_rect = self.forty_speed_sign_cascade.detectMultiScale(image, 1.3, 5)
         national_speed_sign_rect = self.national_speed_sign_cascade.detectMultiScale(image, 1.3, 5)
+        red_light_rect = self.red_light_cascade.detectMultiScale(image, 1.3, 5)
 
-        if len(left_sign_rect) != 0:
-            print("Left sign detected")
-            return 1
-        elif len(thirty_speed_sign_rect) != 0:
+        # if len(left_sign_rect) != 0:
+        #    print("Left sign detected")
+        #    return 1
+        if len(thirty_speed_sign_rect) != 0:
             print("30 speed limit sign detected")
             return 2
-        elif len(forty_speed_sign_rect) != 0:
-            print("40 speed limit sign detected")
-            return 3
+        #elif len(forty_speed_sign_rect) != 0:
+        #    print("40 speed limit sign detected")
+        #    return 3
         elif len(national_speed_sign_rect) != 0:
             print("National speed limit sign detected")
             return 4
+        elif len(red_light_rect) != 0:
+            print("Red light detected!")
+            return 5
         else:
             return 0
 
@@ -144,7 +153,7 @@ class StreamFrames:
                 image.setflags(write=1)
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-                sign_segment = gray[30:150, 200:320]
+                sign_segment = gray[30:150, 180:320]
                 sign_decision = self.sign_detector.detcted_sign(sign_segment)
 
                 # lower half of the image
@@ -165,7 +174,7 @@ class StreamFrames:
             cv2.destroyAllWindows()
             self.car_controller.stop_car()
             end_time = datetime.now()
-            logging.info("Total Journey duration: " + str(end_time-self.start_time) + 'seconds')
+            logging.info("Total Journey duration: " + str(end_time - self.start_time) + 'seconds')
             logging.info("Connection closed on thread 1")
 
 
