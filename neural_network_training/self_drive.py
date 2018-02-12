@@ -85,7 +85,7 @@ class CarControl:
 class SignDetector:
     # left_sign_path = "../classifier_training/working_classifiers/left_sign_classifier.xml"
     thirty_speed_sign_path = "../classifier_training/working_classifiers/thirty_speed_limit_classifier.xml"
-    #forty_speed_sign_path = "../classifier_training/working_classifiers/forty_speed_limit_classifier.xml"
+    # forty_speed_sign_path = "../classifier_training/working_classifiers/forty_speed_limit_classifier.xml"
     national_speed_sign_path = "../classifier_training/working_classifiers/national_speed_limit_classifier.xml"
     red_light_path = "../classifier_training/working_classifiers/red_light_classifier.xml"
 
@@ -111,7 +111,7 @@ class SignDetector:
         if len(thirty_speed_sign_rect) != 0:
             print("30 speed limit sign detected")
             return 2
-        #elif len(forty_speed_sign_rect) != 0:
+        # elif len(forty_speed_sign_rect) != 0:
         #    print("40 speed limit sign detected")
         #    return 3
         elif len(national_speed_sign_rect) != 0:
