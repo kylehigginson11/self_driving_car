@@ -36,6 +36,7 @@ class NeuralNetwork:
 
 class CarControl:
     speed = 0.4
+    turning_speed = 0.315
 
     def __init__(self):
         self.car = Car(9, 6)
@@ -48,13 +49,13 @@ class CarControl:
             if sign_decision == 0:
                 if prediction == 1:
                     # speed left wheel, left dir, speed right wheel, right dir
-                    self.car.set_motors(0.315, 0, 0.4, 0)
+                    self.car.set_motors(self.turning_speed, 0, self.speed, 0)
                     # print("Left")
                 elif prediction == 2:
                     self.car.set_motors(self.speed, 0, self.speed, 0)
                     # print("Forward")
                 elif prediction == 3:
-                    self.car.set_motors(0.4, 0, 0.315, 0)
+                    self.car.set_motors(self.speed, 0, self.turning_speed, 0)
                     # print("Right")
                 else:
                     self.car.stop()
@@ -63,12 +64,15 @@ class CarControl:
             #     self.car.stop()
             elif sign_decision == 2:
                 self.speed = 0.3
+                self.turning_speed = 0.236
                 self.car.set_motors(self.speed, 0, self.speed, 0)
             elif sign_decision == 3:
                 self.speed = 0.5
+                self.turning_speed = 0.394
                 self.car.set_motors(self.speed, 0, self.speed, 0)
             elif sign_decision == 4:
                 self.speed = 0.7
+                self.turning_speed = 0.551
                 self.car.set_motors(self.speed, 0, self.speed, 0)
             elif sign_decision == 5:
                 self.car.stop()
@@ -159,7 +163,7 @@ class StreamFrames:
                 # lower half of the image
                 half_gray = gray[100:220, :]
 
-                # reshape image
+                # reshape the image in matrix
                 image_array = half_gray.reshape(1, 38400).astype(np.float32)
 
                 # reset camera for next frame

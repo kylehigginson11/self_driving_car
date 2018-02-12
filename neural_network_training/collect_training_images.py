@@ -83,7 +83,7 @@ class CollectTrainingImages:
                 # save streamed images
                 cv2.imwrite('training_images/frame{:>05}.jpg'.format(frame_number), lower_half)
 
-                # reshape the roi image into one numpy array
+                # reshape the image in matrix
                 frame_array = lower_half.reshape(1, 38400).astype(np.float32)
 
                 # increment frame number and total frames
