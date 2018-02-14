@@ -157,7 +157,7 @@ class StreamFrames:
                 image.setflags(write=1)
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-                sign_segment = gray[30:150, 180:320]
+                sign_segment = gray[0:160, 200:320]
                 sign_decision = self.sign_detector.detcted_sign(sign_segment)
 
                 # lower half of the image

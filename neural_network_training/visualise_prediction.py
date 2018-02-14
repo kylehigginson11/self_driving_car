@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('TkAgg')
+
 import matplotlib.pyplot as plt2
 from sklearn.model_selection import train_test_split
 import cv2
@@ -26,15 +29,10 @@ model = cv2.ml.ANN_MLP_load('neural_networks/neural_network.xml')
 
 diff = []
 ratio = []
-pred = model.predict(x_test)
+_, pred = model.predict(x_train)
 
-for u in range(len(y_test)):
-    pr = pred[u][0]
-    ratio.append((y_test[u] / pr) - 1)
-    diff.append(abs(y_test[u] - pr))
-
-
-plt2.plot(pred, color='red', label='Prediction')
-plt2.plot(y_test, color='blue', label='Ground Truth')
-plt2.legend(loc='upper left')
+## The line / model
+plt2.scatter(y_train, pred)
+plt2.xlabel("True Values")
+plt2.ylabel("Predictions")
 plt2.show()
