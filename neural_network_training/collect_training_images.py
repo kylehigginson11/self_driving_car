@@ -28,10 +28,10 @@ class CollectTrainingImages:
     def __init__(self):
 
         # create labels, 4 possible directions
-        self.array = np.zeros((4, 4), 'float')
-        for i in range(4):
+        self.array = np.zeros((3, 3), 'float')
+        for i in range(3):
             self.array[i, i] = 1
-        self.temp_label = np.zeros((1, 4), 'float')
+        self.temp_label = np.zeros((1, 3), 'float')
         self.send_inst = True
         # initiate camera
         self.setup_camera()
@@ -68,7 +68,7 @@ class CollectTrainingImages:
         # get current amount of ticks
         time_start = datetime.now()
         image_array = np.zeros((1, 38400))
-        label_array = np.zeros((1, 4), 'float')
+        label_array = np.zeros((1, 3), 'float')
 
         # stream video frames one by one
         try:
@@ -95,19 +95,19 @@ class CollectTrainingImages:
                 if self.joy.X():
                     # print("Forward Left")
                     image_array = np.vstack((image_array, frame_array))
-                    label_array = np.vstack((label_array, self.array[1]))
+                    label_array = np.vstack((label_array, self.array[0]))
                     saved_frame += 1
                     self.car.set_motors(0.315, 0, 0.4, 0)
                 elif self.joy.Y():
                     # print("Forward")
                     saved_frame += 1
                     image_array = np.vstack((image_array, frame_array))
-                    label_array = np.vstack((label_array, self.array[2]))
+                    label_array = np.vstack((label_array, self.array[1]))
                     self.car.set_motors(0.3, 0, 0.3, 0)
                 elif self.joy.B():
                     # print("Forward Right")
                     image_array = np.vstack((image_array, frame_array))
-                    label_array = np.vstack((label_array, self.array[3]))
+                    label_array = np.vstack((label_array, self.array[2]))
                     saved_frame += 1
                     self.car.set_motors(0.4, 0, 0.315, 0)
                 elif self.joy.dpadDown():

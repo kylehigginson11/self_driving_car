@@ -18,7 +18,7 @@ logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level
 class NeuralNetwork:
 
     def __init__(self):
-        layer_sizes = np.int32([38400, 32, 4])
+        layer_sizes = np.int32([38400, 32, 3])
         self.ann = cv2.ml.ANN_MLP_create()
         self.ann.setLayerSizes(layer_sizes)
 
@@ -47,14 +47,14 @@ class CarControl:
         if distance > 15:
             # if a sign is not detcted (sign_decision will be 0)
             if sign_decision == 0:
-                if prediction == 1:
+                if prediction == 0:
                     # speed left wheel, left dir, speed right wheel, right dir
                     self.car.set_motors(self.turning_speed, 0, self.speed, 0)
                     # print("Left")
-                elif prediction == 2:
+                elif prediction == 1:
                     self.car.set_motors(self.speed, 0, self.speed, 0)
                     # print("Forward")
-                elif prediction == 3:
+                elif prediction == 2:
                     self.car.set_motors(self.speed, 0, self.turning_speed, 0)
                     # print("Right")
                 else:

@@ -32,6 +32,10 @@ case "$1" in
     cd /home/pi/repos/self_driving_car/xbox_control/
     sudo python3 remote_control_car.py
     ;;
+  stream)
+    raspivid -o - -t 0 -vf -hf -fps 10 -b 500000 | ffmpeg -re -ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 -i /dev/zero -f h264 -i - -vcodec copy -acodec aac -ab 128k -g 50 -strict experimental -f flv rtmp://a.rtmp.youtube.com/live2/su1r-euu7-g17y-69z4
+    echo "Stream started"
+    ;;
   *)
     # Refuse to do other stuff
     echo "Usage: /etc/init.d/testdaemon.sh {start|stop|restart}"

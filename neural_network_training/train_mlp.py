@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 
 # Configure logger
-logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level=logging.DEBUG,
+logging.basicConfig(filename='/var/log/driverless_car/driverless_car_training.log', level=logging.DEBUG,
                     format="%(asctime)s:%(levelname)s:%(message)s")
 
 
@@ -20,7 +20,7 @@ class TrainMLP:
         logging.info('Loading training data...')
         # load training data
         self.image_array = np.zeros((1, 38400))
-        self.label_array = np.zeros((1, 4), 'float')
+        self.label_array = np.zeros((1, 3), 'float')
         self.training_data = glob.glob('training_data/*.npz')
         self.load_training_data()
 
@@ -57,7 +57,7 @@ class TrainMLP:
 
         # create artificial neural network
         ann_mlp = cv2.ml.ANN_MLP_create()
-        ann_mlp.setLayerSizes(np.int32([38400, 32, 4]))
+        ann_mlp.setLayerSizes(np.int32([38400, 32, 3]))
         ann_mlp.setActivationFunction(cv2.ml.ANN_MLP_SIGMOID_SYM, 2, 1)
         ann_mlp.setTrainMethod(cv2.ml.ANN_MLP_BACKPROP)
         ann_mlp.setBackpropMomentumScale(0.0)
