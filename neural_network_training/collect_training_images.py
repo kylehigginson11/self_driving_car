@@ -110,8 +110,8 @@ class CollectTrainingImages:
                     label_array = np.vstack((label_array, self.array[2]))
                     saved_frame += 1
                     self.car.set_motors(0.4, 0, 0.315, 0)
-                elif self.joy.dpadDown():
-                    logging.info('Keypad down pressed, exiting')
+                elif self.joy.Back():
+                    logging.info('Back button pressed, exiting')
                     self.car.stop()
                     break
                 else:

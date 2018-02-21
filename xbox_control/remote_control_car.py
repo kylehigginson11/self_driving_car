@@ -1,50 +1,59 @@
-import xbox
+import logging
 import sys
+
+from . import xbox
 sys.path.append('../')
 from car_control.car import Car
 
-# Format floating point number to string format -x.xxx
-def convert_float(n):
-    return '{:6.3f}'.format(n)
+# Configure logger
+logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level=logging.DEBUG,
+                    format="%(asctime)s:%(levelname)s:%(message)s")
 
 
-joy = xbox.Joystick()
-car = Car(9, 6)
+class ControlCar:
 
-#print ("Start controlling car remotely, press back to quit ...")
-# Loop until back button is pressed
-while not joy.Back():
-    # Connection status
-    # if joy.connected():
-    #     print ("Connected   "),
-    # else:
-    #     print ("Disconnected"),
-    # Left analog stick
-    #print ("Left Stick X: {}, Left Stick Y: {}".format(convert_float(joy.leftX()), convert_float(joy.leftY()))),
-    # Right trigger
-    #print ("Right Trigger: ", convert_float(joy.rightTrigger())),
-    # A, B, X, Y buttons
-    if joy.A():
-        car.reverse()
-    elif joy.B():
-        car.set_motors(0.4, 0, 0.315, 0)
-    elif joy.X():
-        car.set_motors(0.315, 0, 0.4, 0)
-    elif joy.Y():
-        car.set_motors(0.3, 0, 0.3, 0)
-    # DPAD, up, down, left or right
-    elif joy.dpadUp():
-        car.forward()
-    elif joy.dpadDown():
-        car.reverse()
-    elif joy.dpadLeft():
-        car.left()
-    elif joy.dpadRight():
-        car.right()
-    else:
-        car.stop()
+    speed = 0.3
+    turning_speed = 0.236
 
-    # Move cursor back to start of line
-    #print chr(13),
-# Close out when done
-joy.close()
+    def __init__(self):
+        self.joy = xbox.Joystick()
+        self.car = Car(9, 6)
+
+        logging.info("Car started in manual mode")
+        self.control()
+
+    def shift_up(self):
+        if self.speed < 0.9:
+            self.speed += 0.2
+            self.turning_speed = self.speed * 0.7875
+
+    def shift_down(self):
+        if self.speed > 0.3:
+            self.speed -= 0.2
+            self.turning_speed = self.speed * 0.7875
+
+    def control(self):
+        # Loop until back button is pressed
+        while not self.joy.Back():
+            # A, B, X, Y buttons
+            if self.joy.A():
+                self.car.set_motors(self.speed, 1, self.speed, 1)
+            elif self.joy.B():
+                self.car.set_motors(self.speed, 0, self.turning_speed, 0)
+            elif self.joy.X():
+                self.car.set_motors(self.turning_speed, 0, self.speed, 0)
+            elif self.joy.Y():
+                self.car.set_motors(self.speed, 0, self.speed, 0)
+            # DPAD, up, down, left or right
+            elif self.joy.dpadUp():
+                self.shift_up()
+            elif self.joy.dpadDown():
+                self.shift_down()
+            else:
+                self.car.stop()
+        # Close out when done
+        self.joy.close()
+
+
+if __name__ == "__main__":
+    ControlCar()
