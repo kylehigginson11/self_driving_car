@@ -22,10 +22,10 @@ class NeuralNetwork:
         self.ann = cv2.ml.ANN_MLP_create()
         self.ann.setLayerSizes(layer_sizes)
 
-    def create(self):
+    def create(self, net_name):
         # load neural network from file
         logging.info("Loading MLP ...")
-        self.ann = cv2.ml.ANN_MLP_load('neural_networks/neural_network.xml')
+        self.ann = cv2.ml.ANN_MLP_load('neural_networks/' + net_name + '_neural_network.xml')
         logging.info("MLP loaded ...")
 
     def predict(self, samples):
@@ -129,17 +129,18 @@ class SignDetector:
             return 0
 
 
-class StreamFrames:
+class StreamFrames():
     start_time = datetime.now()
-    # load neural network
-    model = NeuralNetwork()
-    model.create()
 
-    # initialise car and sign detector
-    car_controller = CarControl()
-    sign_detector = SignDetector()
+    def __init__(self, net_name):
 
-    def __init__(self):
+        # load neural network
+        self.model = NeuralNetwork()
+        self.model.create(net_name=net_name)
+
+        # initialise car and sign detector
+        self.car_controller = CarControl()
+        self.sign_detector = SignDetector()
 
         # initialize the camera and grab a reference to the raw camera capture
         logging.info("Initialising Camera ...")
@@ -184,4 +185,9 @@ class StreamFrames:
 
 
 if __name__ == '__main__':
-    StreamFrames()
+    try:
+        StreamFrames(sys.argv[1])
+    except IndexError:
+        logging.error("No File Name Specified")
+        sys.stdout.write("No File Name Specified")
+

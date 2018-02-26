@@ -14,7 +14,9 @@ logging.basicConfig(filename='/var/log/driverless_car/driverless_car_training.lo
 
 class TrainMLP:
 
-    def __init__(self):
+    def __init__(self, net_name):
+
+        self.net_name = net_name
         logging.info("Training MLP ...")
         self.start_time = datetime.now()
         logging.info('Loading training data...')
@@ -89,9 +91,13 @@ class TrainMLP:
         logging.info('Test accuracy: {}'.format(test_rate))
 
         # save model
-        ann_mlp.save('neural_networks/neural_network.xml')
+        ann_mlp.save('neural_networks/' + self.net_name + '_neural_network.xml')
         logging.info("Model Saved")
 
 
 if __name__ == '__main__':
-    TrainMLP()
+    try:
+        TrainMLP(sys.argv[1])
+    except IndexError:
+        logging.error("No File Name Specified")
+        sys.stdout.write("No File Name Specified")
