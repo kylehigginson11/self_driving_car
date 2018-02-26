@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from . import xbox
+import xbox
 sys.path.append('../')
 from car_control.car import Car
 

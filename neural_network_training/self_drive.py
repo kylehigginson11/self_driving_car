@@ -36,7 +36,7 @@ class NeuralNetwork:
 
 class CarControl:
     speed = 0.4
-    turning_speed = 0.315
+    turning_speed = 0.28
 
     def __init__(self):
         self.car = Car(9, 6)
@@ -50,13 +50,13 @@ class CarControl:
                 if prediction == 0:
                     # speed left wheel, left dir, speed right wheel, right dir
                     self.car.set_motors(self.turning_speed, 0, self.speed, 0)
-                    # print("Left")
+                    print("Left")
                 elif prediction == 1:
                     self.car.set_motors(self.speed, 0, self.speed, 0)
-                    # print("Forward")
+                    print("Forward")
                 elif prediction == 2:
                     self.car.set_motors(self.speed, 0, self.turning_speed, 0)
-                    # print("Right")
+                    print("Right")
                 else:
                     self.car.stop()
             # elif sign_decision == 1:
@@ -77,6 +77,7 @@ class CarControl:
             elif sign_decision == 5:
                 self.car.stop()
         else:
+            print('Object in front')
             self.car.stop()
 
     def stop_car(self):
@@ -159,7 +160,7 @@ class StreamFrames:
 
                 sign_segment = gray[0:160, 200:320]
                 sign_decision = self.sign_detector.detcted_sign(sign_segment)
-
+                
                 # lower half of the image
                 half_gray = gray[100:220, :]
 
