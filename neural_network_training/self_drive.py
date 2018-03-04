@@ -8,11 +8,15 @@ from car_control.car import Car
 import picamera
 from picamera.array import PiRGBArray
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
+import requests
 
 # Configure logger
 logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level=logging.DEBUG,
                     format="%(asctime)s:%(levelname)s:%(message)s")
+
+CAR_NAME = "Albert"
+SERVER_IP_ADDRESS = "192.168.1.243"
 
 
 class NeuralNetwork:
@@ -35,15 +39,22 @@ class NeuralNetwork:
 
 
 class CarControl:
+    # set initial speeds
     speed = 0.4
     turning_speed = 0.28
+
+    # count number of frames
+    total_frames = 0
+    total_speeds = 0
 
     def __init__(self):
         self.car = Car(9, 6)
 
     def steer(self, prediction, sign_decision):
         distance = self.car.get_distance()
-
+        # increment number of frames
+        self.total_frames += 1
+        # if nothing is in front of front sensor
         if distance > 15:
             # if a sign is not detcted (sign_decision will be 0)
             if sign_decision == 0:
@@ -76,12 +87,14 @@ class CarControl:
                 self.car.set_motors(self.speed, 0, self.speed, 0)
             elif sign_decision == 5:
                 self.car.stop()
+            self.total_speeds += self.speed
         else:
             print('Object in front')
             self.car.stop()
 
     def stop_car(self):
         self.car.stop()
+        return self.total_speeds / self.total_frames
 
     def change_speed(self, speed):
         self.speed = speed
@@ -129,10 +142,11 @@ class SignDetector:
             return 0
 
 
-class StreamFrames():
+class StreamFrames:
     start_time = datetime.now()
+    sign_detected = False
 
-    def __init__(self, net_name):
+    def __init__(self, net_name, duration=300):
 
         # load neural network
         self.model = NeuralNetwork()
@@ -153,6 +167,7 @@ class StreamFrames():
         # stream video frames one by one
         logging.info("Camera Initialised ...")
 
+        stop_time = datetime.now() + timedelta(seconds=int(duration))
         try:
             for frame in camera.capture_continuous(raw_capture, 'bgr', use_video_port=True):
                 image = frame.array
@@ -161,7 +176,9 @@ class StreamFrames():
 
                 sign_segment = gray[0:160, 200:320]
                 sign_decision = self.sign_detector.detcted_sign(sign_segment)
-                
+                if sign_decision != 0:
+                    self.sign_detected = True
+
                 # lower half of the image
                 half_gray = gray[100:220, :]
 
@@ -176,18 +193,34 @@ class StreamFrames():
                 # print (prediction)
 
                 self.car_controller.steer(prediction, sign_decision)
+
+                if stop_time < datetime.now():
+                    break
         finally:
             cv2.destroyAllWindows()
-            self.car_controller.stop_car()
+            average_speed = self.car_controller.stop_car()
             end_time = datetime.now()
-            logging.info("Total Journey duration: " + str(end_time - self.start_time) + 'seconds')
+            duration = (end_time - self.start_time).total_seconds()
+            logging.info("Contacting interface to log journey")
+            post_data = {"car_name": CAR_NAME,
+                         "duration": duration,
+                         "average_speed": average_speed*100,
+                         "sign_detected": self.sign_detected
+                         }
+            request = requests.post('http://{}:8000/api/add_journey/'.format(SERVER_IP_ADDRESS), data=post_data)
+            if request.status_code == 200:
+                logging.info("Journey logged successfully!")
+            else:
+                logging.warning("Couldn't log journey")
+            logging.info("Total Journey duration: " + str(duration) + 'seconds')
             logging.info("Connection closed on thread 1")
 
 
 if __name__ == '__main__':
-    try:
+    if len(sys.argv) == 2:
         StreamFrames(sys.argv[1])
-    except IndexError:
+    elif len(sys.argv) == 3:
+        StreamFrames(sys.argv[1], sys.argv[2])
+    else:
         logging.error("No File Name Specified")
         sys.stdout.write("No File Name Specified")
-
