@@ -17,16 +17,18 @@ logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level
 
 CAR_NAME = "Albert"
 SERVER_IP_ADDRESS = "192.168.1.243"
+OUTPUT_LAYER_SIZE = 3
+IMAGE_PIXELS = 38400  # 320 * (240/2)
 
 
 class NeuralNetwork:
 
     def __init__(self):
-        layer_sizes = np.int32([38400, 32, 3])
+        layer_sizes = np.int32([IMAGE_PIXELS, 32, OUTPUT_LAYER_SIZE])
         self.ann = cv2.ml.ANN_MLP_create()
         self.ann.setLayerSizes(layer_sizes)
 
-    def create(self, net_name):
+    def load(self, net_name):
         # load neural network from file
         logging.info("Loading MLP ...")
         self.ann = cv2.ml.ANN_MLP_load('neural_networks/' + net_name + '_neural_network.xml')
@@ -150,7 +152,7 @@ class StreamFrames:
 
         # load neural network
         self.model = NeuralNetwork()
-        self.model.create(net_name=net_name)
+        self.model.load(net_name=net_name)
 
         # initialise car and sign detector
         self.car_controller = CarControl()

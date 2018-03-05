@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import glob
 import sys
+import os
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import logging
@@ -10,6 +11,9 @@ from datetime import datetime
 # Configure logger
 logging.basicConfig(filename='/var/log/driverless_car/driverless_car_training.log', level=logging.DEBUG,
                     format="%(asctime)s:%(levelname)s:%(message)s")
+
+OUTPUT_LAYER_SIZE = 3
+IMAGE_PIXELS = 38400  # 320 * (240/2)
 
 
 class TrainMLP:
@@ -21,14 +25,13 @@ class TrainMLP:
         self.start_time = datetime.now()
         logging.info('Loading training data...')
         # load training data
-        self.image_array = np.zeros((1, 38400))
-        self.label_array = np.zeros((1, 3), 'float')
+        self.image_array = np.zeros((1, IMAGE_PIXELS))
+        self.label_array = np.zeros((1, OUTPUT_LAYER_SIZE), 'float')
         self.training_data = glob.glob('training_data/*.npz')
         self.load_training_data()
 
     def load_training_data(self):
-
-        if self.training_data:
+        try:
             # loop through all collected image files
             for npz_file in self.training_data:
                 with np.load(npz_file) as data:
@@ -46,7 +49,7 @@ class TrainMLP:
             load_image_time = end_time - self.start_time
             logging.info('Loading image duration:' + str(load_image_time.seconds) + 'seconds')
             self.create_mlp(image_data_x, label_data_y)
-        else:
+        except FileNotFoundError:
             logging.error("Cant find training data!")
             sys.exit()
 
@@ -59,7 +62,7 @@ class TrainMLP:
 
         # create artificial neural network
         ann_mlp = cv2.ml.ANN_MLP_create()
-        ann_mlp.setLayerSizes(np.int32([38400, 32, 3]))
+        ann_mlp.setLayerSizes(np.int32([IMAGE_PIXELS, 32, OUTPUT_LAYER_SIZE]))
         ann_mlp.setActivationFunction(cv2.ml.ANN_MLP_SIGMOID_SYM, 2, 1)
         ann_mlp.setTrainMethod(cv2.ml.ANN_MLP_BACKPROP)
         ann_mlp.setBackpropMomentumScale(0.0)

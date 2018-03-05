@@ -5,7 +5,7 @@ case "$1" in
     echo "Starting server"
     # Start the daemon
     cd /home/pi/repos/self_driving_car/neural_network_training/
-    sudo python3 self_drive.py $2 &
+    sudo python3 self_drive.py $2 $3 &
     ;;
   stop)
     echo "Stopping server"
