@@ -1,10 +1,21 @@
-from unittest import TestCase
+import unittest
 from unittest.mock import patch
-from neural_network_training.collect_training_images import CollectTrainingImages
+
+import sys
+sys.path.append("../")
+import os
+
+from neural_network_training.train_mlp import TrainMLP
 
 
-class TestNeuralNetwork(TestCase):
+class TestNeuralNetwork(unittest.TestCase):
 
-    @patch('main.Blog')
-    def test_sum(self, sum):
-        self.assertEqual(sum(2,3), 9)
+    @patch('neural_network_training.train_mlp.TrainMLP', 'create_mlp', return_value="PASS")
+    def test_creation(self):
+        ann_name = "test"
+        ann_location = 'neural_network/{}_neural_network.xml'.format(ann_name)
+        trainer = TrainMLP(ann_name)
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -96,7 +96,7 @@ class CarControl:
 
     def stop_car(self):
         self.car.stop()
-        return self.total_speeds / self.total_frames
+        return int((self.total_speeds / self.total_frames)*100)
 
     def change_speed(self, speed):
         self.speed = speed
@@ -145,7 +145,6 @@ class SignDetector:
 
 
 class StreamFrames:
-    start_time = datetime.now()
     sign_detected = False
 
     def __init__(self, net_name, duration=300):
@@ -168,6 +167,7 @@ class StreamFrames:
         time.sleep(1)
         # stream video frames one by one
         logging.info("Camera Initialised ...")
+        self.start_time = datetime.now()
 
         stop_time = datetime.now() + timedelta(seconds=int(duration))
         try:
@@ -202,11 +202,11 @@ class StreamFrames:
             cv2.destroyAllWindows()
             average_speed = self.car_controller.stop_car()
             end_time = datetime.now()
-            duration = (end_time - self.start_time).total_seconds()
+            duration = int((end_time - self.start_time).total_seconds())
             logging.info("Contacting interface to log journey")
             post_data = {"car_name": CAR_NAME,
                          "duration": duration,
-                         "average_speed": average_speed*100,
+                         "average_speed": average_speed,
                          "sign_detected": self.sign_detected
                          }
             request = requests.post('http://{}:8000/api/add_journey/'.format(SERVER_IP_ADDRESS), data=post_data)
