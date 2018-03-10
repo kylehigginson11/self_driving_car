@@ -1,8 +1,8 @@
+# Python imports
 import cv2
 import numpy as np
 import glob
 import sys
-import os
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import logging

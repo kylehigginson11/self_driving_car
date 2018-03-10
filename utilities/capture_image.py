@@ -1,9 +1,13 @@
-import picamera
+"""Script to capture image, save to cloudinary gallery and return url to image"""
+# Python imports
 import time
 import sys
 import os
 import random
 import string
+# Raspberry Pi imports
+import picamera
+# Clouinary imports
 from cloudinary.uploader import upload
 from cloudinary.utils import cloudinary_url
 from cloudinary.api import delete_resources_by_tag, resources_by_tag

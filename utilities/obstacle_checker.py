@@ -1,5 +1,7 @@
+# Python imports
 import sys
 sys.path.append('../')
+# local imports
 from car_control.car import Car
 
 

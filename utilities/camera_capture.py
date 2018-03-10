@@ -1,8 +1,11 @@
-import picamera
+"""Script to test the Raspberry Pi camera capture function"""
+# Python imports
 import time
 import cv2
+# Raspberry Pi imports
+from picamera import PiCamera
 
-camera = picamera.PiCamera()
+camera = PiCamera()
 time.sleep(1)
 camera.resolution = (320, 240)
 camera.rotation = 180

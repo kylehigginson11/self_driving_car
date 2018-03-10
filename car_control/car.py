@@ -1,11 +1,12 @@
+# Raspberry Pi GPIO import
 import RPi.GPIO as GPIO
+
+# Python imports
 import time
-#import pigpio
 
 
-# part of the code in this file is Based on: https://github.com/simonmonk/raspirobotboard3/blob/master/python/rrb3.py
+# part of the code in this file is taken from: https://github.com/simonmonk/raspirobotboard3/blob/master/python/rrb3.py
 class Car:
-
     MOTOR_DELAY = 0.2
 
     RIGHT_PWM_PIN = 14
@@ -24,7 +25,7 @@ class Car:
 
     # Servo motor pin and initialisation
     SERVO_PIN = 15
-    #servo = pigpio.pi()
+    # servo = pigpio.pi()
 
     old_left_dir = -1
     old_right_dir = -1
@@ -124,16 +125,16 @@ class Car:
         return distance_cm
 
     # functions to change angle of servo motor
-    #def send_pluse(self, angle):
+    # def send_pluse(self, angle):
     #    self.servo.set_servo_pulsewidth(self.SERVO_PIN, angle)
 
-    #def look_center(self):
+    # def look_center(self):
     #    self.servo.set_servo_pulsewidth(self.SERVO_PIN, 1800)
 
-    #def look_left(self):
+    # def look_left(self):
     #    self.servo.set_servo_pulsewidth(self.SERVO_PIN, 2500)
 
-    #def look_right(self):
+    # def look_right(self):
     #    self.servo.set_servo_pulsewidth(self.SERVO_PIN, 700)
 
     def cleanup(self):

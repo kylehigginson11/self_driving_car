@@ -1,8 +1,11 @@
+# Python imports
 import logging
 import sys
-
-import xbox
 sys.path.append('../')
+from time import sleep
+# xbox module import
+import xbox
+# local imports
 from car_control.car import Car
 
 # Configure logger
@@ -11,7 +14,6 @@ logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level
 
 
 class ControlCar:
-
     speed = 0.3
     turning_speed = 0.236
 
@@ -22,11 +24,13 @@ class ControlCar:
         logging.info("Car started in manual mode")
         self.control()
 
+    # increase speed function
     def shift_up(self):
         if self.speed < 0.9:
             self.speed += 0.2
             self.turning_speed = self.speed * 0.7875
 
+    # decrease speed function
     def shift_down(self):
         if self.speed > 0.3:
             self.speed -= 0.2
@@ -47,8 +51,10 @@ class ControlCar:
             # DPAD, up, down, left or right
             elif self.joy.dpadUp():
                 self.shift_up()
+                sleep(0.3)
             elif self.joy.dpadDown():
                 self.shift_down()
+                sleep(0.3)
             else:
                 self.car.stop()
         # Close out when done

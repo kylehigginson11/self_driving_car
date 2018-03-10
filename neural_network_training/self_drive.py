@@ -1,15 +1,17 @@
+# Python imports
 import sys
-
 sys.path.append('../')
 import cv2
 import numpy as np
-import math, time
-from car_control.car import Car
-import picamera
-from picamera.array import PiRGBArray
+import time
 import logging
 from datetime import datetime, timedelta
 import requests
+# Raspberry Pi imports
+import picamera
+from picamera.array import PiRGBArray
+# local imports
+from car_control.car import Car
 
 # Configure logger
 logging.basicConfig(filename='/var/log/driverless_car/driverless_car.log', level=logging.DEBUG,
