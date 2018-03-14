@@ -39,6 +39,7 @@ case "$1" in
     # collect training data
     cd /home/pi/repos/self_driving_car/neural_network_training/
     sudo python3 collect_training_images.py &
+    ;;
   *)
     # Refuse to do other stuff
     echo "Usage: /etc/init.d/testdaemon.sh {start|stop|restart}"
