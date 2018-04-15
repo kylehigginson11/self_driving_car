@@ -27,27 +27,22 @@ class TrainMLP:
         # load training data
         self.image_array = np.zeros((1, IMAGE_PIXELS))
         self.label_array = np.zeros((1, OUTPUT_LAYER_SIZE), 'float')
-        self.training_data = glob.glob('training_data/*.npz')
         self.load_training_data()
 
     def load_training_data(self):
         try:
             # loop through all collected image files
-            for npz_file in self.training_data:
+            for npz_file in glob.glob('training_data/*.npz'):
                 with np.load(npz_file) as data:
                     train_temp = data['train']
                     train_labels_temp = data['train_labels']
+                # use stack to append to other files loaded
                 self.image_array = np.vstack((self.image_array, train_temp))
                 self.label_array = np.vstack((self.label_array, train_labels_temp))
 
             image_data_x = self.image_array[1:, :]
             label_data_y = self.label_array[1:, :]
-            logging.info('Image array shape: ' + str(image_data_x.shape))
-            logging.info('Label array shape: ' + str(label_data_y.shape))
 
-            end_time = datetime.now()
-            load_image_time = end_time - self.start_time
-            logging.info('Loading image duration:' + str(load_image_time.seconds) + 'seconds')
             self.create_mlp(image_data_x, label_data_y)
         except FileNotFoundError:
             logging.error("Cant find training data!")
@@ -71,7 +66,7 @@ class TrainMLP:
         ann_mlp.setTermCriteria((cv2.TERM_CRITERIA_COUNT | cv2.TERM_CRITERIA_EPS, 500, 0.0001))
 
         logging.info('Training MLP ...')
-        train_ann = ann_mlp.train(np.float32(x_train), cv2.ml.ROW_SAMPLE, np.float32(y_train))
+        ann_mlp.train(np.float32(x_train), cv2.ml.ROW_SAMPLE, np.float32(y_train))
 
         # set end time
         train_end_time = datetime.now()

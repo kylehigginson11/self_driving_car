@@ -26,6 +26,7 @@ IMAGE_PIXELS = 38400  # 320 * (240/2)
 class NeuralNetwork:
 
     def __init__(self):
+        # initialise the neural network and set the required parameters
         layer_sizes = np.int32([IMAGE_PIXELS, 32, OUTPUT_LAYER_SIZE])
         self.ann = cv2.ml.ANN_MLP_create()
         self.ann.setLayerSizes(layer_sizes)
@@ -38,7 +39,7 @@ class NeuralNetwork:
 
     def predict(self, samples):
         # make prediction on passed data
-        ret, resp = self.ann.predict(samples)
+        _ret, resp = self.ann.predict(samples)
         return resp.argmax(-1)
 
 
@@ -65,13 +66,10 @@ class CarControl:
                 if prediction == 0:
                     # speed left wheel, left dir, speed right wheel, right dir
                     self.car.set_motors(self.turning_speed, 0, self.speed, 0)
-                    print("Left")
                 elif prediction == 1:
                     self.car.set_motors(self.speed, 0, self.speed, 0)
-                    print("Forward")
                 elif prediction == 2:
                     self.car.set_motors(self.speed, 0, self.turning_speed, 0)
-                    print("Right")
                 else:
                     self.car.stop()
             # elif sign_decision == 1:

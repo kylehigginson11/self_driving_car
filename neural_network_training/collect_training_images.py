@@ -5,7 +5,6 @@ import numpy as np
 import cv2
 import os
 import time
-from datetime import datetime
 import logging
 # Raspberry Pi imports
 from picamera import PiCamera
@@ -69,7 +68,6 @@ class CollectTrainingImages:
         logging.info('Start controlling car ...')
 
         # get current amount of ticks
-        time_start = datetime.now()
         image_array = np.zeros((1, IMAGE_PIXELS))
         label_array = np.zeros((1, OUTPUT_LAYER_SIZE), 'float')
 
@@ -117,11 +115,6 @@ class CollectTrainingImages:
             training_images = image_array[1:, :]
             training_labels = label_array[1:, :]
             self.save_training_data(train_images=training_images, train_labels=training_labels)
-
-            time_end = datetime.now()
-            # calculate collection duration
-            total_time = (time_end - time_start).seconds
-            logging.info('Collection Time: ' + str(int(total_time)) + 'seconds')
 
             logging.info(training_images.shape)
             logging.info(training_labels.shape)
