@@ -5,6 +5,7 @@ import glob
 import sys
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
 import logging
 from datetime import datetime
 
@@ -88,9 +89,16 @@ class TrainMLP:
         test_rate = accuracy_score(y_test.argmax(-1), test_prediction.argmax(axis=-1))
         logging.info('Test accuracy: {}'.format(test_rate))
 
+        _, y_pred = ann_mlp.predict(x_test)
+        self.evaluate_model(y_test.argmax(-1), y_pred.argmax(axis=-1))
+
         # save model
         ann_mlp.save('neural_networks/' + self.net_name + '_neural_network.xml')
         logging.info("Model Saved")
+
+    def evaluate_model(self, y_test, y_train):
+        print("*** EVALUATION REPORT ***")
+        print(classification_report(y_test, y_train))
 
 
 if __name__ == '__main__':
