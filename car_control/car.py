@@ -5,10 +5,10 @@ import RPi.GPIO as GPIO
 import time
 
 
-# part of the code in this file is taken from: https://github.com/simonmonk/raspirobotboard3/blob/master/python/rrb3.py
 class Car:
     MOTOR_DELAY = 0.2
 
+    # DC motor pins
     RIGHT_PWM_PIN = 14
     RIGHT_1_PIN = 10
     RIGHT_2_PIN = 25
@@ -23,16 +23,10 @@ class Car:
     TRIGGER_PIN = 18
     ECHO_PIN = 23
 
-    # Servo motor pin and initialisation
-    SERVO_PIN = 15
-    # servo = pigpio.pi()
-
     old_left_dir = -1
     old_right_dir = -1
 
-    DEFAULT_TAG = "albert_photo"
-
-    def __init__(self, battery_voltage=9.0, motor_voltage=6.0, revision=2):
+    def __init__(self, battery_voltage=9.0, motor_voltage=6.0,):
 
         self.pwm_scale = float(motor_voltage) / float(battery_voltage)
 
@@ -76,32 +70,8 @@ class Car:
         GPIO.output(self.RIGHT_1_PIN, right_dir)
         GPIO.output(self.RIGHT_2_PIN, not right_dir)
 
-    def forward(self, seconds=0, speed=1.0):
-        self.set_motors(speed, 0, speed, 0)
-        if seconds > 0:
-            time.sleep(seconds)
-            self.stop()
-
     def stop(self):
         self.set_motors(0, 0, 0, 0)
-
-    def reverse(self, seconds=0, speed=1.0):
-        self.set_motors(speed, 1, speed, 1)
-        if seconds > 0:
-            time.sleep(seconds)
-            self.stop()
-
-    def right(self, seconds=0, speed=0.5):
-        self.set_motors(speed, 0, speed, 1)
-        if seconds > 0:
-            time.sleep(seconds)
-            self.stop()
-
-    def left(self, seconds=0, speed=0.5):
-        self.set_motors(speed, 1, speed, 0)
-        if seconds > 0:
-            time.sleep(seconds)
-            self.stop()
 
     # functions to get values from sensor
     def _send_trigger_pulse(self):
@@ -123,19 +93,6 @@ class Car:
         pulse_len = finish - start
         distance_cm = pulse_len / 0.000058
         return distance_cm
-
-    # functions to change angle of servo motor
-    # def send_pluse(self, angle):
-    #    self.servo.set_servo_pulsewidth(self.SERVO_PIN, angle)
-
-    # def look_center(self):
-    #    self.servo.set_servo_pulsewidth(self.SERVO_PIN, 1800)
-
-    # def look_left(self):
-    #    self.servo.set_servo_pulsewidth(self.SERVO_PIN, 2500)
-
-    # def look_right(self):
-    #    self.servo.set_servo_pulsewidth(self.SERVO_PIN, 700)
 
     def cleanup(self):
         GPIO.cleanup()

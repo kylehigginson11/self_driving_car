@@ -25,22 +25,22 @@ IMAGE_PIXELS = 38400  # 320 * (240/2)
 
 class NeuralNetwork:
 
-    def __init__(self):
+    def __init__(self, net_name):
         # initialise the neural network and set the required parameters
-        layer_sizes = np.int32([IMAGE_PIXELS, 32, OUTPUT_LAYER_SIZE])
+        logging.info("Initialising neural network")
+        layer_sizes = np.array([IMAGE_PIXELS, 32, OUTPUT_LAYER_SIZE], dtype=np.int32)
         self.ann = cv2.ml.ANN_MLP_create()
         self.ann.setLayerSizes(layer_sizes)
-
-    def load(self, net_name):
         # load neural network from file
         logging.info("Loading MLP ...")
         self.ann = cv2.ml.ANN_MLP_load('neural_networks/' + net_name + '_neural_network.xml')
         logging.info("MLP loaded ...")
 
-    def predict(self, samples):
+    def predict_direction(self, samples):
         # make prediction on passed data
-        _ret, resp = self.ann.predict(samples)
-        return resp.argmax(-1)
+        _, resp = self.ann.predict(samples)
+        # return class with highest value
+        return resp.argmax(axis=-1)
 
 
 class CarControl:
@@ -55,7 +55,7 @@ class CarControl:
     def __init__(self):
         self.car = Car(9, 6)
 
-    def steer(self, prediction, sign_decision):
+    def steer(self, direction, sign_decision):
         distance = self.car.get_distance()
         # increment number of frames
         self.total_frames += 1
@@ -63,12 +63,12 @@ class CarControl:
         if distance > 15:
             # if a sign is not detcted (sign_decision will be 0)
             if sign_decision == 0:
-                if prediction == 0:
+                if direction == 0:
                     # speed left wheel, left dir, speed right wheel, right dir
                     self.car.set_motors(self.turning_speed, 0, self.speed, 0)
-                elif prediction == 1:
+                elif direction == 1:
                     self.car.set_motors(self.speed, 0, self.speed, 0)
-                elif prediction == 2:
+                elif direction == 2:
                     self.car.set_motors(self.speed, 0, self.turning_speed, 0)
                 else:
                     self.car.stop()
@@ -150,8 +150,7 @@ class StreamFrames:
     def __init__(self, net_name, duration=300):
 
         # load neural network
-        self.model = NeuralNetwork()
-        self.model.load(net_name=net_name)
+        self.model = NeuralNetwork(net_name=net_name)
 
         # initialise car and sign detector
         self.car_controller = CarControl()
@@ -169,6 +168,7 @@ class StreamFrames:
         logging.info("Camera Initialised ...")
         self.start_time = datetime.now()
 
+        # set the time to end journey
         stop_time = datetime.now() + timedelta(seconds=int(duration))
         try:
             for frame in camera.capture_continuous(raw_capture, 'bgr', use_video_port=True):
@@ -191,11 +191,12 @@ class StreamFrames:
                 raw_capture.truncate(0)
 
                 # neural network makes prediction
-                prediction = self.model.predict(image_array)
-                # print (prediction)
+                direction = self.model.predict_direction(image_array)
+                # print (direction)
 
-                self.car_controller.steer(prediction, sign_decision)
+                self.car_controller.steer(direction, sign_decision)
 
+                # if duration is up, break out of loop
                 if stop_time < datetime.now():
                     break
         finally:

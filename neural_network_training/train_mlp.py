@@ -4,7 +4,6 @@ import numpy as np
 import glob
 import sys
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 import logging
 from datetime import datetime
@@ -30,25 +29,6 @@ class TrainMLP:
         self.label_array = np.zeros((1, OUTPUT_LAYER_SIZE), 'float')
         self.load_training_data()
 
-    def load_training_data(self):
-        try:
-            # loop through all collected image files
-            for npz_file in glob.glob('training_data/*.npz'):
-                with np.load(npz_file) as data:
-                    train_temp = data['train']
-                    train_labels_temp = data['train_labels']
-                # use stack to append to other files loaded
-                self.image_array = np.vstack((self.image_array, train_temp))
-                self.label_array = np.vstack((self.label_array, train_labels_temp))
-
-            image_data_x = self.image_array[1:, :]
-            label_data_y = self.label_array[1:, :]
-
-            self.create_mlp(image_data_x, label_data_y)
-        except FileNotFoundError:
-            logging.error("Cant find training data!")
-            sys.exit()
-
     def create_mlp(self, images, labels):
         # train test split, can use random_state=42 to set a seed here, splits data so can calculate accuracy
         x_train, x_test, y_train, y_test = train_test_split(images, labels, test_size=0.3)
@@ -58,7 +38,7 @@ class TrainMLP:
 
         # create artificial neural network
         ann_mlp = cv2.ml.ANN_MLP_create()
-        ann_mlp.setLayerSizes(np.int32([IMAGE_PIXELS, 32, OUTPUT_LAYER_SIZE]))
+        ann_mlp.setLayerSizes(np.array([IMAGE_PIXELS, 32, OUTPUT_LAYER_SIZE], dtype=np.int32))
         ann_mlp.setActivationFunction(cv2.ml.ANN_MLP_SIGMOID_SYM, 2, 1)
         ann_mlp.setTrainMethod(cv2.ml.ANN_MLP_BACKPROP)
         ann_mlp.setBackpropMomentumScale(0.0)
@@ -73,22 +53,26 @@ class TrainMLP:
         train_end_time = datetime.now()
         train_time = (train_end_time - train_start_time)
         logging.info('Training duration: ' + str(train_time.seconds) + 'seconds')
-        self.save_mlp(x_train, x_test, y_train, y_test, ann_mlp)
+        self.save_mlp(x_test, y_test, ann_mlp)
 
-    def save_mlp(self, x_train, x_test, y_train, y_test, ann_mlp):
+    def load_training_data(self):
+        try:
+            # loop through all collected image files
+            for npz_file in glob.glob('training_data/*.npz'):
+                with np.load(npz_file) as data:
+                    image_temp = data['train']
+                    labels_temp = data['train_labels']
+                # use vstack to append to other files loaded
+                self.image_array = np.vstack((self.image_array, image_temp))
+                self.label_array = np.vstack((self.label_array, labels_temp))
 
-        # calculate train accuracy
-        _train, train_prediction = ann_mlp.predict(x_train)
+            # create neural network from NumPy arrays
+            self.create_mlp(self.image_array[1:, :], self.label_array[1:, :])
+        except FileNotFoundError:
+            logging.error("Cant find training data!")
+            sys.exit()
 
-        train_rate = accuracy_score(y_train.argmax(-1), train_prediction.argmax(axis=-1))
-        logging.info('Train accuracy: {}'.format(train_rate))
-
-        # calculate test accuracy
-        _test, test_prediction = ann_mlp.predict(x_test)
-
-        test_rate = accuracy_score(y_test.argmax(-1), test_prediction.argmax(axis=-1))
-        logging.info('Test accuracy: {}'.format(test_rate))
-
+    def save_mlp(self, x_test, y_test, ann_mlp):
         _, y_pred = ann_mlp.predict(x_test)
         self.evaluate_model(y_test.argmax(-1), y_pred.argmax(axis=-1))
 
